@@ -51,37 +51,37 @@ router.get('/all', verifikasi_token, async(req,res)=>{
 //     }
 // });
 
-router.post('/register', async(req,res)=>{
-    const data = req.body;
-    try {
-        const username = await database("petugas").where('username', data.username).first();
-        if (username) {
-            return res.status(400).json({
-                status : 0,
-                message : "username sudah ada"
-            })
-        } else {
-            const create = {
-                username : data.username,
-                password : bcrypt.hashSync(data.password,12)
-            }
-            const simpan = await database("petugas").insert(create);
-            return res.status(200).json({
-                status : 1,
-                message : "Berhasil",
-                result : {
-                    id_petugas : simpan[0],
-                    ...create
-                }
-            })
-        }
-    } catch (error) {
-        return res.status(500).json({
-            status : 0,
-            message : error.message
-        })
-    }
-});
+// router.post('/register', async(req,res)=>{
+//     const data = req.body;
+//     try {
+//         const username = await database("petugas").where('username', data.username).first();
+//         if (username) {
+//             return res.status(400).json({
+//                 status : 0,
+//                 message : "username sudah ada"
+//             })
+//         } else {
+//             const create = {
+//                 username : data.username,
+//                 password : bcrypt.hashSync(data.password,12)
+//             }
+//             const simpan = await database("petugas").insert(create);
+//             return res.status(200).json({
+//                 status : 1,
+//                 message : "Berhasil",
+//                 result : {
+//                     id_petugas : simpan[0],
+//                     ...create
+//                 }
+//             })
+//         }
+//     } catch (error) {
+//         return res.status(500).json({
+//             status : 0,
+//             message : error.message
+//         })
+//     }
+// });
 
 router.post('/login', async(req,res)=>{
     const data = req.body;
