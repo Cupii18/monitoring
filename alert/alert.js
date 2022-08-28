@@ -6,7 +6,7 @@ const verifikasi_validasi_data = require("../middleware/verifikasi_validasi_data
 
 router.get('/all', async (req,res) =>{
     try {
-        const result = await database.select("*").from('tambah_petugas');
+        const result = await database.select("*").from('alert');
         if(result.length > 0){
             return res.status(200).json({
                 status :1,
@@ -34,7 +34,7 @@ router.post('/simpan', validasi_data.data, verifikasi_validasi_data, async (req,
         status: "on"
     }
     try {
-        const simpan = await database("tambah_petugas").insert(input);
+        const simpan = await database("alert").insert(input);
         if(simpan){
             return res.status(200).json({
                 status : 1,
@@ -58,12 +58,12 @@ router.post('/simpan', validasi_data.data, verifikasi_validasi_data, async (req,
     }
 });
 
-router.put('/edit/:id_add',validasi_data.edit_data,verifikasi_validasi_data, async (req,res) =>{
+router.put('/edit/:id_alert',validasi_data.edit_data,verifikasi_validasi_data, async (req,res) =>{
     const data = req.body;
     try {
-        const result = await database("tambah_petugas").where('id_add',req.params.id_add).first();
+        const result = await database("alert").where('id_alert',req.params.id_alert).first();
         if (result){
-            await database("tambah_petugas").update(data).where('id_add',req.params.id_add);
+            await database("alert").update(data).where('id_alert',req.params.id_alert);
             return res.status(200).json({
                 status : 1,
                 message : "Berhasil"
@@ -82,9 +82,9 @@ router.put('/edit/:id_add',validasi_data.edit_data,verifikasi_validasi_data, asy
     }
 });
 
-router.delete('/delete/:id_add', async (req,res) =>{
+router.delete('/delete/:id_alert', async (req,res) =>{
     try {
-        const update = await database("tambah_petugas").update("status", "on").where('id_add' ,req.params.id_add);
+        const update = await database("alert").update("status", "aman").where('id_alert' ,req.params.id_alert);
         if(update){
             return res.status(200).json({
                 status :1,
