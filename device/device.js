@@ -4,6 +4,30 @@ const database = require("../config/database");
 const validasi_data = require("./validasi_data");
 const verifikasi_validasi_data = require("../middleware/verifikasi_validasi_data");
 
+router.get('/all', async (req,res) =>{
+    try {
+        const result = await database.select("*").from('tb_device');
+        if(result.length > 0){
+            return res.status(200).json({
+                status :1,
+                message : "berhasil",
+                result : result
+            })
+        }else{
+           return res.status(400).json({
+               status : 0,
+               message : "data tidak ditemukan",
+          })
+        }   
+    } catch (error) {
+        return res.status(500).json({
+            status : 0,
+            message : error.message
+        })
+    }
+});
+
+
 router.get('/jenis_device', async(req,res)=>{ 
     try { 
         const result = await database.raw(`SELECT tb_device.*, tb_jenis_device.nama_jenis, tb_jenis_device.keterangan, tb_jenis_device.status FROM tb_device

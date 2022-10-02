@@ -147,9 +147,9 @@ router.delete('/delete/:id_indikator', async (req,res) =>{
     }
 });
 
-router.get('/one/:id_jabatan', async(req,res)=>{
+router.get('/one/:id_indikator', async(req,res)=>{
         try {
-            const result = await database("tb_jabatan").select("*").where('id_jabatan' ,req.params.id_jabatan).first();
+            const result = await database("tb_indikator").select("*").where('id_indikator' ,req.params.id_indikator).first();
             if(result){
                 return res.status(200).json({
                     status :1,

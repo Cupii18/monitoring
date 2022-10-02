@@ -104,5 +104,28 @@ router.delete('/delete/:id_jenis_device', async (req,res) =>{
     }
 });
 
+router.get('/one/:id_jenis_device', async(req,res)=>{
+    try {
+        const result = await database("tb_jenis_device").select("*").where('id_jenis_device' ,req.params.id_jenis_device).first();
+        if(result){
+            return res.status(200).json({
+                status :1,
+                message : "berhasil",
+                result : result
+            })
+        }else{
+           return res.status(400).json({
+               status : 0,
+               message : "data tidak ditemukan",
+          })
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status : 0,
+            message : error.message
+        })
+    }
+});
+
 
 module.exports = router;
