@@ -16,9 +16,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/", require("./router/index"));
 
 app.use((req, res, next) => {
-    const error = new Error("Not Found");
-    error.status = 404;
-    next(error);
+    res.status(404).json({
+        status: 0,
+        message: "Not Found",
+    });
 });
 
 
