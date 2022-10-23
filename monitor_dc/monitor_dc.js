@@ -24,21 +24,11 @@ router.get('/all', async (req, res) => {
                 }
             })
 
-        res.json({
-            status: true,
-            message: 'success',
-            data: result
-        })
-
-
-        const hasil_data = result
-        if (hasil_data) {
-
+        if (result) {
             return res.status(200).json({
                 status: 1,
                 message: "berhasil",
-                type: typeof (data_arry),
-                result: data_arry
+                result: result
             });
         } else {
             return res.status(400).json({
