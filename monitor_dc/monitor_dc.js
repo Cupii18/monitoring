@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const database = require("../config/database");
 
-router.get('/all', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const result = await database
             .select('tb_device.nama_device', 'monitor_dc.waktu', 'monitor_dc.tegangan', 'monitor_dc.arus', 'monitor_dc.whatt', 'monitor_dc.kwh', 'tb_indikator.nama_indikator', 'tb_indikator.satuan')
