@@ -2,48 +2,56 @@ const express = require("express");
 const router = express.Router();
 const database = require("../config/database");
 
-router.get('/all', async(req,res)=>{ 
-    try { 
-        const result = await database.raw(`SELECT monitor_dc.*, tb_device.id_jenis_device,tb_device.id_sektor,tb_device.nama_device,tb_device.deskripsi,tb_device.status FROM monitor_dc 
-        LEFT OUTER JOIN tb_device on tb_device.id_device = monitor_dc.id_device`); 
-        const hasil_data = result[0] 
-        if(hasil_data.length > 0){ 
-            var data_arry= []; 
-            hasil_data.forEach(async row => { 
-                var array_x = {}; 
-                array_x['no'] = row.no 
-                array_x['id_device'] = row.id_device
-                array_x['tegangan'] = row.tegangan 
-                array_x['arus'] = row.arus
-                array_x['whatt'] = row.whatt 
-                array_x['kwh'] = row.kwh 
-                array_x['waktu'] = row.wkatu 
-                array_x['status'] = row.status 
-                array_x['id_jenis_device'] = row.id_jenis_device
-                array_x['id_sektor'] = row.id_sektor
-                array_x['nama_device'] = row.nama_device
-                array_x['deskripsi'] = row.deskripsi
-                array_x['status'] = row.status
- 
-                data_arry.push(array_x); 
-            }); 
-            return res.status(200).json({ 
-                status : 1, 
-                message : "berhasil", 
-                result : data_arry 
-            }); 
-        }else{ 
-            return res.status(400).json({ 
-                status : 0, 
-                message : "data tidak ditemukan" 
-            }); 
-        } 
-    } catch (error) { 
-        return res.status(500).json({ 
-            status : 0, 
-            message : error.message 
-        }) 
-    } 
+router.get('/all', async (req, res) => {
+    try {
+        const result = await database
+            .select('tb_device.nama_device', 'monitor_dc.waktu', 'monitor_dc.tegangan', 'monitor_dc.arus', 'monitor_dc.whatt', 'monitor_dc.kwh', 'tb_indikator.nama_indikator', 'tb_indikator.satuan')
+            .from('monitor_dc')
+            .join('tb_device', 'monitor_dc.id_device', 'tb_device.id_device')
+            .join('tb_indikator', 'tb_device.id_device', 'tb_indikator.id_device')
+            .join('tb_sektor', 'tb_device.id_sektor', 'tb_sektor.id_sektor')
+            .modify(function (queryBuilder) {
+                if (req.query.id_sektor) {
+                    queryBuilder.where('tb_sektor.id_sektor', req.query.id_sektor)
+                }
+
+                if (req.query.id_device) {
+                    queryBuilder.where('tb_device.id_device', req.query.id_device)
+                }
+
+                if (req.query.id_indikator) {
+                    queryBuilder.where('tb_indikator.id_indikator', req.query.id_indikator)
+                }
+            })
+
+        res.json({
+            status: true,
+            message: 'success',
+            data: result
+        })
+
+
+        const hasil_data = result
+        if (hasil_data) {
+
+            return res.status(200).json({
+                status: 1,
+                message: "berhasil",
+                type: typeof (data_arry),
+                result: data_arry
+            });
+        } else {
+            return res.status(400).json({
+                status: 0,
+                message: "data tidak ditemukan"
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: 0,
+            message: error.message
+        })
+    }
 });
 
 // router.get('/all', async (req,res) =>{
