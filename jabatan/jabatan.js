@@ -6,12 +6,28 @@ const verifikasi_validasi_data = require("../middleware/verifikasi_validasi_data
 
 router.get('/', async (req, res) => {
     try {
-        const result = await database.select("*").from('tb_jabatan').where('status', 'a');
-        if (result.length > 0) {
+        const result = await database
+            .select("*")
+            .from('tb_jabatan')
+            .where('status', 'a')
+            .modify(function (queryBuilder) {
+                if (req.query.cari) {
+                    queryBuilder.where('nama_jabatan', 'like', `%${req.query.cari}%`)
+                }
+            }).paginate({
+                perPage: req.query.limit,
+                currentPage: req.query.page,
+                isLengthAware: true
+            });
+
+        if (result.data.length > 0) {
             return res.status(200).json({
                 status: 1,
                 message: "Berhasil",
-                result: result
+                result: result.data,
+                per_page: result.pagination.perPage,
+                total_pages: result.pagination.to,
+                total_data: result.pagination.total,
             })
         } else {
             return res.status(200).json({
