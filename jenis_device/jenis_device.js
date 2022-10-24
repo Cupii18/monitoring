@@ -21,22 +21,14 @@ router.get('/', async (req, res) => {
                 isLengthAware: true
             });
 
-
-        if (result.data.length > 0) {
-            return res.status(200).json({
-                status: 1,
-                message: "Berhasil",
-                result: result.data,
-                per_page: result.pagination.perPage,
-                total_pages: req.query.limit ? result.pagination.to : null,
-                total_data: req.query.limit ? result.pagination.total : null
-            })
-        } else {
-            return res.status(200).json({
-                status: 0,
-                message: "data tidak ditemukan",
-            })
-        }
+        return res.status(200).json({
+            status: 1,
+            message: "Berhasil",
+            result: result.data,
+            per_page: result.pagination.perPage,
+            total_pages: req.query.limit ? result.pagination.to : null,
+            total_data: req.query.limit ? result.pagination.total : null
+        })
     } catch (error) {
         return res.status(500).json({
             status: 0,
@@ -53,8 +45,9 @@ router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) 
     }
     try {
         const simpan = await database("tb_jenis_device").insert(input);
+
         if (simpan) {
-            return res.status(200).json({
+            return res.status(201).json({
                 status: 1,
                 message: "Berhasil",
                 result: {
@@ -63,7 +56,7 @@ router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) 
                 }
             })
         } else {
-            return res.status(400).json({
+            return res.status(422).json({
                 status: 0,
                 message: "Gagal",
             })
@@ -82,12 +75,12 @@ router.put('/:id_jenis_device', validasi_data.edit_data, verifikasi_validasi_dat
         const result = await database("tb_jenis_device").where('id_jenis_device', req.params.id_jenis_device).first();
         if (result) {
             await database("tb_jenis_device").update(data).where('id_jenis_device', req.params.id_jenis_device);
-            return res.status(200).json({
+            return res.status(201).json({
                 status: 1,
                 message: "Berhasil"
             })
         } else {
-            return res.status(400).json({
+            return res.status(422).json({
                 status: 0,
                 message: "Data tidak ditemukan",
             })
@@ -104,12 +97,12 @@ router.delete('/:id_jenis_device', async (req, res) => {
     try {
         const update = await database("tb_jenis_device").update("status", "t").where('id_jenis_device', req.params.id_jenis_device);
         if (update) {
-            return res.status(200).json({
+            return res.status(201).json({
                 status: 1,
-                message: "berhasil",
+                message: "Berhasil",
             })
         } else {
-            return res.status(400).json({
+            return res.status(422).json({
                 status: 0,
                 message: "gagal",
             })
@@ -124,19 +117,18 @@ router.delete('/:id_jenis_device', async (req, res) => {
 
 router.get('/:id_jenis_device', async (req, res) => {
     try {
-        const result = await database("tb_jenis_device").select("*").where('id_jenis_device', req.params.id_jenis_device).first();
-        if (result) {
-            return res.status(200).json({
-                status: 1,
-                message: "berhasil",
-                result: result
-            })
-        } else {
-            return res.status(400).json({
-                status: 0,
-                message: "data tidak ditemukan",
-            })
-        }
+        const result = await database("tb_jenis_device")
+            .select("*")
+            .where('id_jenis_device', req.params.id_jenis_device)
+            .andWhere('status', 'a')
+            .first();
+
+        return res.status(200).json({
+            status: 1,
+            message: "Berhasil",
+            result: result || {}
+        })
+
     } catch (error) {
         return res.status(500).json({
             status: 0,
