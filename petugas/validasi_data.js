@@ -6,8 +6,7 @@ module.exports.register = [
     check('email').not().isEmpty().withMessage('email harus ada data'),
     check('no_tlp').not().isEmpty().withMessage('no_tlp harus ada data'),
     check('username').not().isEmpty().withMessage('username harus ada data'),
-    check('password').not().isEmpty().withMessage('password harus ada data'),
-    check('status').not().not().isEmpty().withMessage('status harus ada data')
+    check('password').not().isEmpty().withMessage('password harus ada data')
 ]
 
 module.exports.login = [

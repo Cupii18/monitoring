@@ -10,37 +10,30 @@ const nodemailer = require("nodemailer");
 
 router.get('/all', async(req,res)=>{ 
     try { 
-        const result = await database.raw(`SELECT tb_petugas.*, tb_jabatan.nama_jabatan,tb_jabatan.status FROM tb_petugas 
-        LEFT OUTER JOIN tb_jabatan on tb_jabatan.id_jabatan = tb_petugas.id_jabatan`); 
-        const hasil_data = result[0] 
-        if(hasil_data.length > 0){ 
-            var data_arry= []; 
-            hasil_data.forEach(async row => { 
-                var array_x = {}; 
-                array_x['id_petugas'] = row.id_petugas
-                array_x['id_jabatan'] = row.jabatan 
-                array_x['nama_lengkap'] = row.nama_lengkap
-                array_x['email'] = row.email 
-                array_x['no_tlp'] = row.no_tlp 
-                array_x['username'] = row.username
-                array_x['password'] = row.password
-                array_x['status'] = row.status 
-                array_x['nama_jabatan'] = row.nama_jabatan
-                array_x['status'] = row.status
- 
-                data_arry.push(array_x); 
-            }); 
-            return res.status(200).json({ 
-                status : 1, 
-                message : "berhasil", 
-                result : data_arry 
-            }); 
-        }else{ 
-            return res.status(400).json({ 
-                status : 0, 
-                message : "data tidak ditemukan" 
-            }); 
-        } 
+        const result = await database
+        .select(
+            "petugas.id_petugas",
+            "petugas.nama_lengkap",
+            "petugas.email",
+            "petugas.no_tlp",
+            "petugas.username",
+            "petugas.password",
+            "jenis_device.nama_jenis"
+        )
+        .from('tb_device as device')
+        .leftJoin('tb_jenis_device as jenis_device', 'alert.id_device')
+        .where('device.status', 'a')
+            .modify(function (queryBuilder) {
+                if (req.query.cari) {
+                    queryBuilder.where('alert.nama_alert', 'like', '%' + req.query.cari + '%')
+                        .orWhere('device.nama_device', 'like', '%' + req.query.cari + '%')
+                }
+            })
+            .paginate({
+                perPage: req.query.limit || null,
+                currentPage: req.query.page || null,
+                isLengthAware: true
+            });
     } catch (error) { 
         return res.status(500).json({ 
             status : 0, 
@@ -61,12 +54,7 @@ router.get('/profil/:id_petugas', async(req,res)=>{
                 message : "berhasil", 
                 result : hasil_data 
             }); 
-        }else{ 
-            return res.status(400).json({ 
-                status : 0, 
-                message : "data tidak ditemukan" 
-            }); 
-        } 
+        }
     } catch (error) { 
         return res.status(500).json({ 
             status : 0, 
@@ -97,7 +85,7 @@ router.post('/register', validasi_data.register, verifikasi_validasi_data, async
             password : bcrypt.hashSync(data.password,14)
         }
         const simpan = await database("tb_petugas").insert(createTb_petugas);
-        return res.status(200).json({
+        return res.status(201).json({
             status: 1,
             message : "Berhasil",
             result : {
