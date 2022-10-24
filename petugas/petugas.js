@@ -13,20 +13,23 @@ router.get('/', async (req, res) => {
         const result = await database
             .select(
                 "petugas.id_petugas",
+                "petugas.id_card",
                 "petugas.nama_lengkap",
                 "petugas.email",
                 "petugas.no_tlp",
                 "petugas.username",
                 "petugas.password",
-                "jenis_device.nama_jenis"
+                "jabatan.nama_jabatan",
             )
-            .from('tb_device as device')
-            .leftJoin('tb_jenis_device as jenis_device', 'alert.id_device')
-            .where('device.status', 'a')
+            .from('tb_petugas as petugas')
+            .join('tb_jabatan as jabatan', 'petugas.id_jabatan', 'jabatan.id_jabatan')
+            .where('petugas.status', 'a')
             .modify(function (queryBuilder) {
                 if (req.query.cari) {
-                    queryBuilder.where('alert.nama_alert', 'like', '%' + req.query.cari + '%')
-                        .orWhere('device.nama_device', 'like', '%' + req.query.cari + '%')
+                    queryBuilder.where('petugas.nama_lengkap', 'like', '%' + req.query.cari + '%')
+                        .orWhere('petugas.email', 'like', '%' + req.query.cari + '%')
+                        .orWhere('petugas.no_tlp', 'like', '%' + req.query.cari + '%')
+                        .orWhere('petugas.username', 'like', '%' + req.query.cari + '%')
                 }
             })
             .paginate({
@@ -35,6 +38,14 @@ router.get('/', async (req, res) => {
                 isLengthAware: true
             });
 
+        return res.status(200).json({
+            status: 1,
+            message: "Berhasil",
+            result: result.data,
+            per_page: result.pagination.perPage,
+            total_pages: req.query.limit ? result.pagination.to : null,
+            total_data: req.query.limit ? result.pagination.total : null,
+        })
 
     } catch (error) {
         return res.status(500).json({
