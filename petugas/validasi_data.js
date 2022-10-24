@@ -1,4 +1,4 @@
-const {check} = require("express-validator");
+const { check } = require("express-validator");
 
 module.exports.register = [
     check('id_jabatan').not().isEmpty().withMessage('id_jabatan harus ada data'),
