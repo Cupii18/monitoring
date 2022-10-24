@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 
-router.use("/petugas/" ,require("../petugas/petugas"));
+router.use("/petugas", require("../petugas/petugas"));
 router.use("/jabatan", require("../jabatan/jabatan"));
 router.use("/jenis_device", require("../jenis_device/jenis_device"));
 router.use("/sektor", require("../sektor/sektor"));
