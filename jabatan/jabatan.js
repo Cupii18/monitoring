@@ -15,9 +15,9 @@ router.get('/', async (req, res) => {
                     queryBuilder.where('nama_jabatan', 'like', `%${req.query.cari}%`)
                 }
             }).paginate({
-                perPage: req.query.limit,
-                currentPage: req.query.page,
-                isLengthAware: true
+                perPage: req.query.limit || null,
+                currentPage: req.query.page || null,
+                isLengthAware: true,
             });
 
         if (result.data.length > 0) {
@@ -26,8 +26,8 @@ router.get('/', async (req, res) => {
                 message: "Berhasil",
                 result: result.data,
                 per_page: result.pagination.perPage,
-                total_pages: result.pagination.to,
-                total_data: result.pagination.total,
+                total_pages: req.query.limit ? result.pagination.to : null,
+                total_data: req.query.limit ? result.pagination.total : null,
             })
         } else {
             return res.status(200).json({

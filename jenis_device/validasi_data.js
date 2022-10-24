@@ -1,14 +1,10 @@
-const {check} = require("express-validator");
+const { check } = require("express-validator");
 
 module.exports.data = [
-    check('nama_jenis').not().isEmpty().withMessage('nama_jenis harus ada data'),
-    check('keterangan').not().isEmpty().withMessage('keterangan harus ada data'),
-    check('status').not().isEmpty().withMessage('status harus ada data')
-    
+    check('nama_jenis').not().isEmpty().withMessage('Nama Jenis Device tidak boleh kosong'),
+
 ]
 
 module.exports.edit_data = [
-    check('nama_jenis').not().isEmpty().withMessage('nama_jenis harus ada data'),
-    check('keterangan').not().isEmpty().withMessage('keterangan harus ada data'),
-    check('status').not().isEmpty().withMessage('status harus ada data')
+    check('nama_jenis').not().isEmpty().withMessage('Nama Jenis Device tidak boleh kosong'),
 ]

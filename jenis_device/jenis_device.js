@@ -9,15 +9,30 @@ router.get('/', async (req, res) => {
         const result = await database
             .select("*")
             .from('tb_jenis_device')
-            .where;
-        if (result.length > 0) {
+            .where('status', 'a')
+            .modify(function (queryBuilder) {
+                if (req.query.cari) {
+                    queryBuilder.where('nama_jenis', 'like', '%' + req.query.cari + '%')
+                }
+            })
+            .paginate({
+                perPage: req.query.limit || null,
+                currentPage: req.query.page || null,
+                isLengthAware: true
+            });
+
+
+        if (result.data.length > 0) {
             return res.status(200).json({
                 status: 1,
-                message: "berhasil",
-                result: result
+                message: "Berhasil",
+                result: result.data,
+                per_page: result.pagination.perPage,
+                total_pages: req.query.limit ? result.pagination.to : null,
+                total_data: req.query.limit ? result.pagination.total : null
             })
         } else {
-            return res.status(400).json({
+            return res.status(200).json({
                 status: 0,
                 message: "data tidak ditemukan",
             })
@@ -50,7 +65,7 @@ router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) 
         } else {
             return res.status(400).json({
                 status: 0,
-                message: "gagal simpan",
+                message: "Gagal",
             })
         }
     } catch (error) {
