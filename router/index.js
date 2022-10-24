@@ -4,6 +4,7 @@ const router = express.Router();
 
 router.use("/petugas", require("../petugas/petugas"));
 router.use("/jabatan", require("../jabatan/jabatan"));
+router.use("/role", require("../role/index"));
 router.use("/jenis_device", require("../jenis_device/jenis_device"));
 router.use("/sektor", require("../sektor/sektor"));
 router.use("/indikator", require("../indikator/indikator"));
