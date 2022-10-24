@@ -203,12 +203,12 @@ router.delete('/delete/:id_alert', async (req, res) => {
         if (update) {
             return res.status(200).json({
                 status: 1,
-                message: "berhasil",
+                message: "Berhasil",
             })
         } else {
             return res.status(400).json({
                 status: 0,
-                message: "gagal",
+                message: "Gagal",
             })
         }
     } catch (error) {
@@ -221,7 +221,7 @@ router.delete('/delete/:id_alert', async (req, res) => {
 
 router.get('/one/:id_alert', async (req, res) => {
     try {
-        const result = await database("tb_alert").select("*").where('id_alert', req.params.id_alert).first();
+        const result = await database("tb_alert").select("*").where('id_alert', req.params.id_alert).andWhere('status', 'a').first();
         if (result) {
             return res.status(200).json({
                 status: 1,
