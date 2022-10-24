@@ -10,16 +10,12 @@ router.get('/', async (req, res) => {
             .select(
                 "device.id_device",
                 "device.nama_device",
-                "alert.kondisi",
-                "alert.interval",
-                "alert.status",
-                "alert.tanggal",
-                "device.nama_device",
+                "device.deskripsi",
+                "device.status",
                 "jenis_device.nama_jenis",
-                "petugas.nama_lengkap",
-                "jabatan.nama_jabatan",
+                "sektor.nama_sektor",
             )
-            .from('tb_alert as alert')
+            .from('tb_device as device')
             .leftJoin('tb_device as device', 'alert.id_device', 'device.id_device')
             .leftJoin('tb_jenis_device as jenis_device', 'device.id_jenis_device', 'jenis_device.id_jenis_device')
             .leftJoin('tb_petugas as petugas', 'alert.id_petugas', 'petugas.id_petugas')

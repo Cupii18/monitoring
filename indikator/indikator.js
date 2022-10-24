@@ -83,18 +83,18 @@ router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) 
     }
 });
 
-router.put('/edit/:id_indikator', validasi_data.edit_data, verifikasi_validasi_data, async (req, res) => {
+router.put('/:id_indikator', validasi_data.edit_data, verifikasi_validasi_data, async (req, res) => {
     const data = req.body;
     try {
         const result = await database("tb_indikator").where('id_indikator', req.params.id_indikator).first();
         if (result) {
             await database("tb_indikator").update(data).where('id_indikator', req.params.id_indikator);
-            return res.status(200).json({
+            return res.status(201).json({
                 status: 1,
                 message: "Berhasil"
             })
         } else {
-            return res.status(400).json({
+            return res.status(422).json({
                 status: 0,
                 message: "Data tidak ditemukan",
             })
@@ -107,16 +107,16 @@ router.put('/edit/:id_indikator', validasi_data.edit_data, verifikasi_validasi_d
     }
 });
 
-router.delete('/delete/:id_indikator', async (req, res) => {
+router.delete('/:id_indikator', async (req, res) => {
     try {
         const update = await database("tb_indikator").update("status", "t").where('id_indikator', req.params.id_indikator);
         if (update) {
-            return res.status(200).json({
+            return res.status(201).json({
                 status: 1,
                 message: "berhasil",
             })
         } else {
-            return res.status(400).json({
+            return res.status(422).json({
                 status: 0,
                 message: "gagal",
             })
@@ -129,7 +129,7 @@ router.delete('/delete/:id_indikator', async (req, res) => {
     }
 });
 
-router.get('/one/:id_indikator', async (req, res) => {
+router.get('/:id_indikator', async (req, res) => {
     try {
         const result = await database("tb_indikator").select("*").where('id_indikator', req.params.id_indikator).first();
         if (result) {
