@@ -138,11 +138,6 @@ router.get('/one/:id_indikator', async (req, res) => {
                 message: "berhasil",
                 result: result
             })
-        } else {
-            return res.status(400).json({
-                status: 0,
-                message: "data tidak ditemukan",
-            })
         }
     } catch (error) {
         return res.status(500).json({

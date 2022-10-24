@@ -54,95 +54,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-// router.get('/device', async(req,res)=>{ 
-//     try { 
-//         const result = await database.raw(`SELECT tb_alert.*, tb_device.id_jenis_device,tb_device.id_sektor,tb_device.nama_device,tb_device.deskripsi,tb_device.status FROM tb_alert 
-//         LEFT OUTER JOIN tb_device on tb_device.id_device = tb_alert.id_device`); 
-//         const hasil_data = result[0] 
-//         if(hasil_data.length > 0){ 
-//             var data_arry= []; 
-//             hasil_data.forEach(async row => { 
-//                 var array_x = {}; 
-//                 array_x['id_petugas'] = row.id_petugas
-//                 array_x['id_device'] = row.id_device
-//                 array_x['nama_alert'] = row.nama_alert
-//                 array_x['kondisi'] = row.kondisi
-//                 array_x['interval'] = row.interval
-//                 array_x['status'] = row.status 
-//                 array_x['tanggal'] = row.tanggal 
-//                 array_x['id_jenis_device'] = row.id_jenis_device
-//                 array_x['id_sektor'] = row.id_sektor
-//                 array_x['nama_device'] = row.nama_device
-//                 array_x['deskripsi'] = row.deskripsi
-//                 array_x['status'] = row.status
-
-//                 data_arry.push(array_x); 
-//             }); 
-//             return res.status(200).json({ 
-//                 status : 1, 
-//                 message : "berhasil", 
-//                 result : data_arry 
-//             }); 
-//         }else{ 
-//             return res.status(400).json({ 
-//                 status : 0, 
-//                 message : "data tidak ditemukan" 
-//             }); 
-//         } 
-//     } catch (error) { 
-//         return res.status(500).json({ 
-//             status : 0, 
-//             message : error.message 
-//         }) 
-//     } 
-// });
-
-
-// router.get('/petugas', async(req,res)=>{ 
-//     try { 
-//         const result = await database.raw(`SELECT tb_alert.*, tb_petugas.id_jabatan, tb_petugas.nama_lengkap, tb_petugas.email, tb_petugas.no_tlp, tb_petugas.status FROM tb_alert 
-//         LEFT OUTER JOIN tb_petugas on tb_petugas.id_petugas = tb_alert.id_petugas`); 
-//         const hasil_data = result[0] 
-//         if(hasil_data.length > 0){ 
-//             var data_arry= []; 
-//             hasil_data.forEach(async row => { 
-//                 var array_x = {}; 
-//                 array_x['id_petugas'] = row.id_petugas
-//                 array_x['id_device'] = row.id_device
-//                 array_x['nama_alert'] = row.nama_alert
-//                 array_x['kondisi'] = row.kondisi
-//                 array_x['interval'] = row.interval
-//                 array_x['status'] = row.status 
-//                 array_x['tanggal'] = row.tanggal 
-//                 array_x['id_jabatan'] = row.id_jabatan
-//                 array_x['nama_lengkap'] = row.nama_lengkap
-//                 array_x['email'] = row.email
-//                 array_x['no_tlp'] = row.no_tlp
-//                 array_x['status'] = row.status
-
-//                 data_arry.push(array_x); 
-//             }); 
-//             return res.status(200).json({ 
-//                 status : 1, 
-//                 message : "berhasil", 
-//                 result : data_arry 
-//             }); 
-//         }else{ 
-//             return res.status(400).json({ 
-//                 status : 0, 
-//                 message : "data tidak ditemukan" 
-//             }); 
-//         } 
-//     } catch (error) { 
-//         return res.status(500).json({ 
-//             status : 0, 
-//             message : error.message 
-//         }) 
-//     } 
-// });
-
-
-router.post('/simpan', validasi_data.data, verifikasi_validasi_data, async (req, res) => {
+router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) => {
     const data = req.body;
     const input = {
         ...data,
@@ -151,7 +63,7 @@ router.post('/simpan', validasi_data.data, verifikasi_validasi_data, async (req,
     try {
         const simpan = await database("tb_alert").insert(input);
         if (simpan) {
-            return res.status(200).json({
+            return res.status(201).json({
                 status: 1,
                 message: "Berhasil",
                 result: {
@@ -160,7 +72,7 @@ router.post('/simpan', validasi_data.data, verifikasi_validasi_data, async (req,
                 }
             })
         } else {
-            return res.status(400).json({
+            return res.status(422).json({
                 status: 0,
                 message: "gagal simpan",
             })
@@ -173,18 +85,18 @@ router.post('/simpan', validasi_data.data, verifikasi_validasi_data, async (req,
     }
 });
 
-router.put('/edit/:id_alert', validasi_data.edit_data, verifikasi_validasi_data, async (req, res) => {
+router.put('/:id_alert', validasi_data.edit_data, verifikasi_validasi_data, async (req, res) => {
     const data = req.body;
     try {
         const result = await database("tb_alert").where('id_alert', req.params.id_alert).first();
         if (result) {
             await database("tb_alert").update(data).where('id_alert', req.params.id_alert);
-            return res.status(200).json({
+            return res.status(201).json({
                 status: 1,
                 message: "Berhasil"
             })
         } else {
-            return res.status(400).json({
+            return res.status(422).json({
                 status: 0,
                 message: "Data tidak ditemukan",
             })
@@ -197,16 +109,16 @@ router.put('/edit/:id_alert', validasi_data.edit_data, verifikasi_validasi_data,
     }
 });
 
-router.delete('/delete/:id_alert', async (req, res) => {
+router.delete('/:id_alert', async (req, res) => {
     try {
         const update = await database("tb_alert").update("status", "t").where('id_alert', req.params.id_alert);
         if (update) {
-            return res.status(200).json({
+            return res.status(201).json({
                 status: 1,
                 message: "Berhasil",
             })
         } else {
-            return res.status(400).json({
+            return res.status(422).json({
                 status: 0,
                 message: "Gagal",
             })
@@ -219,7 +131,7 @@ router.delete('/delete/:id_alert', async (req, res) => {
     }
 });
 
-router.get('/one/:id_alert', async (req, res) => {
+router.get('/:id_alert', async (req, res) => {
     try {
         const result = await database("tb_alert").select("*").where('id_alert', req.params.id_alert).andWhere('status', 'a').first();
         if (result) {
@@ -228,12 +140,7 @@ router.get('/one/:id_alert', async (req, res) => {
                 message: "berhasil",
                 result: result
             })
-        } else {
-            return res.status(400).json({
-                status: 0,
-                message: "data tidak ditemukan",
-            })
-        }
+        } 
     } catch (error) {
         return res.status(500).json({
             status: 0,
