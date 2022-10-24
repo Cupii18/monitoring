@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const database = require("../config/database");
-// const bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt");
 // const jwt = require("jsonwebtoken");
-// const validasi_data = require("./validasi_data");
-// const verifikasi_validasi_data = require("../middleware/verifikasi_validasi_data");
+const validasi_data = require("./validasi_data");
+const verifikasi_validasi_data = require("../middleware/verifikasi_validasi_data");
 // const verifikasi_token = require("../middleware/verifikasi_token");
 // const nodemailer = require("nodemailer");
 
@@ -20,9 +20,12 @@ router.get('/', async (req, res) => {
                 "petugas.username",
                 "petugas.password",
                 "jabatan.nama_jabatan",
+                "role.nama_role as role",
+                "petugas.created_at",
             )
             .from('tb_petugas as petugas')
             .join('tb_jabatan as jabatan', 'petugas.id_jabatan', 'jabatan.id_jabatan')
+            .join('tb_role as role', 'petugas.id_role', 'role.id_role')
             .where('petugas.status', 'a')
             .modify(function (queryBuilder) {
                 if (req.query.cari) {
@@ -57,15 +60,38 @@ router.get('/', async (req, res) => {
 
 router.get('/:id_petugas', async (req, res) => {
     try {
-        const result = await database.raw(`SELECT tb_petugas.*, tb_jabatan.nama_jabatan,tb_jabatan.tatus FROM tb_petugas 
-        LEFT OUTER JOIN tb_jabatan on tb_jabatan.id_jabatan = tb_petugas.id_jabatan 
-        WHERE tb_petugas.id_petugas = '${req.params.id_petugas}'`);
-        const hasil_data = result[0][0]
-        if (hasil_data) {
+        const result = await database
+            .select(
+                "petugas.id_petugas",
+                "petugas.id_card",
+                "petugas.nama_lengkap",
+                "petugas.email",
+                "petugas.no_tlp",
+                "petugas.username",
+                "petugas.password",
+                "jabatan.id_jabatan",
+                "jabatan.nama_jabatan",
+                "role.id_role",
+                "role.nama_role",
+                "petugas.created_at",
+            )
+            .from('tb_petugas as petugas')
+            .join('tb_jabatan as jabatan', 'petugas.id_jabatan', 'jabatan.id_jabatan')
+            .join('tb_role as role', 'petugas.id_role', 'role.id_role')
+            .where('petugas.status', 'a')
+            .where('petugas.id_petugas', req.params.id_petugas)
+            .first();
+
+        if (result) {
             return res.status(200).json({
                 status: 1,
                 message: "berhasil",
-                result: hasil_data
+                result: result
+            });
+        } else {
+            return res.status(404).json({
+                status: 0,
+                message: "Data tidak ditemukan"
             });
         }
     } catch (error) {
@@ -76,43 +102,33 @@ router.get('/:id_petugas', async (req, res) => {
     }
 });
 
-// router.post('/register', validasi_data.register, verifikasi_validasi_data, async (req, res) => {
-//     const data = req.body;
-//     try {
-//         const isNo_tlp = await database("tb_petugas").select("*").where('no_tlp', data.no_tlp).first();
-//         if (isNo_tlp) {
-//             return res.status(400).json({
-//                 status: 0,
-//                 message: "Telepon sudah ada"
-//             });
-//         }
-//         const isEmail = await database("tb_petugas").select("*").where('email', data.email).first();
-//         if (isEmail) {
-//             return res.status(400).json({
-//                 status: 0,
-//                 message: "Email sudah ada"
-//             });
-//         }
-//         const createTb_petugas = {
-//             ...data,
-//             password: bcrypt.hashSync(data.password, 14)
-//         }
-//         const simpan = await database("tb_petugas").insert(createTb_petugas);
-//         return res.status(201).json({
-//             status: 1,
-//             message: "Berhasil",
-//             result: {
-//                 id_petugas: simpan[0],
-//                 ...createTb_petugas
-//             }
-//         })
-//     } catch (error) {
-//         return res.status(500).json({
-//             status: 0,
-//             message: error.message
-//         });
-//     }
-// });
+router.post('/', validasi_data.register, verifikasi_validasi_data, async (req, res) => {
+    const data = req.body;
+    try {
+        const createTb_petugas = {
+            ...data,
+            password: bcrypt.hashSync(data.password, 14),
+            status: 'a',
+            created_at: new Date(),
+            updated_at: new Date()
+        }
+        const simpan = await database("tb_petugas").insert(createTb_petugas);
+
+        return res.status(201).json({
+            status: 1,
+            message: "Berhasil",
+            result: {
+                id_petugas: simpan[0],
+                ...createTb_petugas
+            }
+        })
+    } catch (error) {
+        return res.status(500).json({
+            status: 0,
+            message: error.message
+        });
+    }
+});
 
 // router.post('/login', validasi_data.login, verifikasi_validasi_data, async (req, res) => {
 //     const data = req.body;
@@ -185,16 +201,20 @@ router.get('/:id_petugas', async (req, res) => {
 
 router.delete('/:id_petugas', async (req, res) => {
     try {
-        const update = await database("tb_petugas").update("status", "t").where('id_petugas', req.params.id_petugas);
+        const data = {
+            status: 't',
+            updated_at: new Date()
+        };
+        const update = await database("tb_petugas").update(data).where('id_petugas', req.params.id_petugas);
         if (update) {
-            return res.status(200).json({
+            return res.status(201).json({
                 status: 1,
                 message: "berhasil",
             })
         } else {
             return res.status(400).json({
                 status: 0,
-                message: "gagal",
+                message: "Gagal",
             })
         }
     } catch (error) {
@@ -240,23 +260,9 @@ router.delete('/:id_petugas', async (req, res) => {
 router.put('/:id_petugas', async (req, res) => {
     const data = req.body;
     try {
-        const isTelepon = await database("tb_petugas").select("*").where('telepon', data.telepon).first();
-        if (isTelepon) {
-            return res.status(400).json({
-                status: 0,
-                message: "Telepon sudah ada"
-            });
-        }
-        const isEmail = await database("tb_petugas").select("*").where('email', data.email).first();
-        if (isEmail) {
-            return res.status(400).json({
-                status: 0,
-                message: "Email sudah ada"
-            });
-        }
-
+        data.updated_at = new Date();
         await database("tb_petugas").update(data).where('id_petugas', req.params.id_petugas);
-        return res.status(200).json({
+        return res.status(201).json({
             status: 1,
             message: "Berhasil"
         });
