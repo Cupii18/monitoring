@@ -148,6 +148,10 @@ router.get('/:id_alert', async (req, res) => {
                 "alert.interval",
                 "alert.status",
                 "alert.tanggal",
+                "device.id_device",
+                "jenis_device.id_jenis_device",
+                "petugas.id_petugas",
+                "jabatan.id_jabatan",
                 "device.nama_device",
                 "jenis_device.nama_jenis",
                 "petugas.nama_lengkap",
@@ -160,25 +164,12 @@ router.get('/:id_alert', async (req, res) => {
             .leftJoin('tb_jabatan as jabatan', 'petugas.id_jabatan', 'jabatan.id_jabatan')
             .where('alert.status', 'a')
             .andWhare('alert.id_alert', req.params.id_alert)
-            .modify(function (queryBuilder) {
-                if (req.query.cari) {
-                    queryBuilder.where('alert.nama_alert', 'like', '%' + req.query.cari + '%')
-                        .orWhere('device.nama_device', 'like', '%' + req.query.cari + '%')
-                        .orWhere('jenis_device.nama_jenis', 'like', '%' + req.query.cari + '%')
-                }
-            })
-            .paginate({
-                perPage: parseInt(req.query.limit) || 5000,
-                currentPage: req.query.page || null,
-                isLengthAware: true
-            });
+            .first();
+            
         return res.status(200).json({
             status: 1,
             message: "Berhasil",
-            result: result.data,
-            per_page: result.pagination.perPage,
-            total_pages: req.query.limit ? result.pagination.to : null,
-            total_data: req.query.limit ? result.pagination.total : null
+            result: result
         })
     } catch (error) {
         return res.status(500).json({
