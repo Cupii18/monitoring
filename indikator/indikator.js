@@ -14,8 +14,8 @@ router.get('/', async (req, res) => {
                 "indikator.minimum",
                 "indikator.maksimum",
                 "indikator.status",
+                "indikator.icon",
                 "device.nama_device",
-                "jenis_device.nama_jenis"
             )
             .from('tb_indikator as indikator')
             .leftJoin('tb_device as device', 'indikator.id_device', 'device.id_device')
@@ -138,14 +138,28 @@ router.delete('/:id_indikator', async (req, res) => {
 
 router.get('/:id_indikator', async (req, res) => {
     try {
-        const result = await database("tb_indikator").select("*").where('id_indikator', req.params.id_indikator).first();
-        if (result) {
-            return res.status(200).json({
-                status: 1,
-                message: "Berhasil",
-                result: result
-            })
-        }
+        const result = await database
+            .select(
+                "indikator.id_indikator",
+                "indikator.nama_indikator",
+                "indikator.satuan",
+                "indikator.minimum",
+                "indikator.maksimum",
+                "indikator.status",
+                "indikator.icon",
+                "device.nama_device",
+            )
+            .from('tb_indikator as indikator')
+            .leftJoin('tb_device as device', 'indikator.id_device', 'device.id_device')
+            .leftJoin('tb_jenis_device as jenis_device', 'device.id_jenis_device', 'jenis_device.id_jenis_device')
+            .where('indikator.status', 'a')
+            .andWhere('indikator.id_indikator', req.params.id_indikator)
+
+        return res.status(200).json({
+            status: 1,
+            message: "Berhasil",
+            result: result
+        })
     } catch (error) {
         return res.status(500).json({
             status: 0,
