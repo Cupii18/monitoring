@@ -48,105 +48,112 @@ router.get('/', async (req, res) => {
 });
 
 
-router.post('/', validasi_data.data, verifikasi_validasi_data, async (req,res) =>{
+router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) => {
     const data = req.body;
     const input = {
         ...data,
-        status : "a"
+        status: "a",
+        created_at: new Date(),
+        updated_at: new Date()
     }
     try {
         const simpan = await database("tb_device").insert(input);
-        if(simpan){
+        if (simpan) {
             return res.status(201).json({
-                status : 1,
-                message : "Berhasil",
-                result : {
-                    id_device : simpan[0],
+                status: 1,
+                message: "Berhasil",
+                result: {
+                    id_device: simpan[0],
                     ...input
                 }
             })
-        }else{
-           return res.status(422).json({
-               status : 0,
-               message : "Gagal simpan",
-          })
-        }   
-    } catch (error) {
-        return res.status(500).json({
-            status : 0,
-            message : error.message
-        })
-    }
-});
-
-router.put('/:id_device',validasi_data.edit_data,verifikasi_validasi_data, async (req,res) =>{
-    const data = req.body;
-    try {
-        const result = await database("tb_device").where('id_device',req.params.id_device).first();
-        if (result){
-            await database("tb_device").update(data).where('id_device',req.params.id_device);
-            return res.status(201).json({
-                status : 1,
-                message : "Berhasil"
-            })
         } else {
             return res.status(422).json({
-                status : 0,
-                message : "Data tidak ditemukan",
+                status: 0,
+                message: "Gagal simpan",
             })
         }
     } catch (error) {
         return res.status(500).json({
-            status : 0,
-            message : error.message
+            status: 0,
+            message: error.message
+        })
+    }
+});
+
+router.put('/:id_device', validasi_data.edit_data, verifikasi_validasi_data, async (req, res) => {
+    const data = req.body;
+    data.updated_at = new Date();
+    try {
+        const result = await database("tb_device").where('id_device', req.params.id_device).first();
+        if (result) {
+            await database("tb_device").update(data).where('id_device', req.params.id_device);
+            return res.status(201).json({
+                status: 1,
+                message: "Berhasil"
+            })
+        } else {
+            return res.status(422).json({
+                status: 0,
+                message: "Data tidak ditemukan",
+            })
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: 0,
+            message: error.message
         });
     }
 });
 
-router.delete('/:id_device', async (req,res) =>{
+router.delete('/:id_device', async (req, res) => {
     try {
-        const update = await database("tb_device").update("status", "t").where('id_device' ,req.params.id_device);
-        if(update){
+        const data = {
+            status: "t",
+            updated_at: new Date()
+        }
+        const update = await database("tb_device").update(data).where('id_device', req.params.id_device);
+        if (update) {
             return res.status(201).json({
-                status :1,
-                message : "Berhasil",
+                status: 1,
+                message: "Berhasil",
             })
-        }else{
-           return res.status(422).json({
-               status : 0,
-               message : "Gagal",
-          })
-        }   
+        } else {
+            return res.status(422).json({
+                status: 0,
+                message: "Gagal",
+            })
+        }
     } catch (error) {
         return res.status(500).json({
-            status : 0,
-            message : error.message
+            status: 0,
+            message: error.message
         })
     }
 });
 
-router.get('/:id_device', async(req,res)=>{
-        try {
-            const result = await database("tb_device").select("*").where('id_device' ,req.params.id_device).first();
-            if(result){
-                return res.status(200).json({
-                    status :1,
-                    message : "Berhasil",
-                    result : result
-                })
-            }else{
-               return res.status(400).json({
-                   status : 0,
-                   message : "Data tidak ditemukan",
-              })
-            }
-        } catch (error) {
-            return res.status(500).json({
-                status : 0,
-                message : error.message
+router.get('/:id_device', async (req, res) => {
+    try {
+        const result = await database("tb_device").select("*").where('id_device', req.params.id_device).first();
+        if (result) {
+            return res.status(200).json({
+                status: 1,
+                message: "Berhasil",
+                result: result
+            })
+        } else {
+            return res.status(400).json({
+                status: 0,
+                message: "Data tidak ditemukan",
             })
         }
-    });
+    } catch (error) {
+        return res.status(500).json({
+            status: 0,
+            message: error.message
+        })
+    }
+});
 
 
 module.exports = router;
