@@ -29,14 +29,13 @@ router.get('/', async (req, res) => {
             .where('petugas.status', 'a')
             .modify(function (queryBuilder) {
                 if (req.query.cari) {
-                    queryBuilder.where('petugas.nama_lengkap', 'like', '%' + req.query.cari + '%')
-                        .orWhere('petugas.email', 'like', '%' + req.query.cari + '%')
-                        .orWhere('petugas.no_tlp', 'like', '%' + req.query.cari + '%')
-                        .orWhere('petugas.username', 'like', '%' + req.query.cari + '%')
+                    queryBuilder.where('petugas.nama_lengkap', 'like', `%${req.query.cari}%`)
+                        .orWhere('petugas.email', 'like', `%${req.query.cari}%`)
+                        .orWhere('petugas.no_tlp', 'like', `%${req.query.cari}%`)
+                        .orWhere('petugas.username', 'like', `%${req.query.cari}%`)
                 }
-            })
-            .paginate({
-                perPage: parseInt(req.query.limit) || null,
+            }).paginate({
+                perPage: parseInt(req.query.limit) || 5000,
                 currentPage: req.query.page || null,
                 isLengthAware: true
             });

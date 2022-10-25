@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
                     queryBuilder.where('nama_role', 'like', `%${req.query.cari}%`)
                 }
             }).paginate({
-                perPage: parseInt(req.query.limit) || null,
+                perPage: parseInt(req.query.limit) || 5000,
                 currentPage: req.query.page || null,
                 isLengthAware: true,
             });
