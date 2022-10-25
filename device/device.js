@@ -16,16 +16,14 @@ router.get('/', async (req, res) => {
                 "sektor.nama_sektor",
             )
             .from('tb_device as device')
-            .leftJoin('tb_device as device', 'alert.id_device', 'device.id_device')
             .leftJoin('tb_jenis_device as jenis_device', 'device.id_jenis_device', 'jenis_device.id_jenis_device')
-            .leftJoin('tb_petugas as petugas', 'alert.id_petugas', 'petugas.id_petugas')
-            .leftJoin('tb_jabatan as jabatan', 'petugas.id_jabatan', 'jabatan.id_jabatan')
-            .where('alert.status', 'a')
+            .leftJoin('tb_sektor as sektor', 'device.id_sektor', 'sektor.id_sektor')
+            .where('device.status', 'a')
             .modify(function (queryBuilder) {
                 if (req.query.cari) {
-                    queryBuilder.where('alert.nama_alert', 'like', '%' + req.query.cari + '%')
-                        .orWhere('device.nama_device', 'like', '%' + req.query.cari + '%')
+                    queryBuilder.where('device.nama_device', 'like', '%' + req.query.cari + '%')
                         .orWhere('jenis_device.nama_jenis', 'like', '%' + req.query.cari + '%')
+                        .orWhere('sektor.nama_sektor', 'like', '%' + req.query.cari + '%')
                 }
             })
             .paginate({
@@ -70,7 +68,7 @@ router.post('/', validasi_data.data, verifikasi_validasi_data, async (req,res) =
         }else{
            return res.status(422).json({
                status : 0,
-               message : "gagal simpan",
+               message : "Gagal simpan",
           })
         }   
     } catch (error) {
@@ -111,12 +109,12 @@ router.delete('/:id_device', async (req,res) =>{
         if(update){
             return res.status(201).json({
                 status :1,
-                message : "berhasil",
+                message : "Berhasil",
             })
         }else{
            return res.status(422).json({
                status : 0,
-               message : "gagal",
+               message : "Gagal",
           })
         }   
     } catch (error) {
@@ -133,13 +131,13 @@ router.get('/:id_device', async(req,res)=>{
             if(result){
                 return res.status(200).json({
                     status :1,
-                    message : "berhasil",
+                    message : "Berhasil",
                     result : result
                 })
             }else{
                return res.status(400).json({
                    status : 0,
-                   message : "data tidak ditemukan",
+                   message : "Data tidak ditemukan",
               })
             }
         } catch (error) {
