@@ -3,7 +3,7 @@ const database = require("../config/database");
 
 module.exports.register = [
     check('id_jabatan').not().isEmpty().withMessage('Jabatan tidak boleh kosong'),
-    check('id_role').not().isEmpty().withMessage('Role tidak boleh kosong'),
+    check('role').not().isEmpty().withMessage('Role tidak boleh kosong'),
     check('id_card').not().isEmpty().withMessage('ID Card tidak boleh kosong'),
     check('nama_lengkap').not().isEmpty().withMessage('Nama Lengkap tidak boleh kosong'),
     check('email').not().isEmpty().withMessage('Email tidak boleh kosong').isEmail().withMessage('Email tidak valid')

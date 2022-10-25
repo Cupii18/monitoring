@@ -14,16 +14,6 @@ exports.up = function (knex) {
       table.engine('InnoDB');
     });
   }).then(() => {
-    return knex.schema.dropTableIfExists('tb_role').then(() => {
-      return knex.schema.createTable('tb_role', (table) => {
-        table.increments('id_role').primary();
-        table.string('nama_role');
-        table.enum('status', ['a', 't']);
-        table.timestamps();
-        table.engine('InnoDB');
-      });
-    });
-  }).then(() => {
     return knex.schema.dropTableIfExists('tb_sektor').then(() => {
       return knex.schema.createTable('tb_sektor', (table) => {
         table.increments('id_sektor').primary();
@@ -52,7 +42,7 @@ exports.up = function (knex) {
         table.increments('id_petugas').primary();
         table.integer('id_jabatan').unsigned().references('id_jabatan').inTable('tb_jabatan');
         table.string('id_card');
-        table.integer('id_role').unsigned().references('id_role').inTable('tb_role');
+        table.enum('role', ['Sysadmin', 'Admin', 'Petugas']);
         table.string('nama_lengkap');
         table.string('no_tlp');
         table.string('email');
