@@ -14,16 +14,6 @@ exports.up = function (knex) {
       table.engine('InnoDB');
     });
   }).then(() => {
-    return knex.schema.dropTableIfExists('tb_role').then(() => {
-      return knex.schema.createTable('tb_role', (table) => {
-        table.increments('id_role').primary();
-        table.string('nama_role');
-        table.enum('status', ['a', 't']);
-        table.timestamps();
-        table.engine('InnoDB');
-      });
-    });
-  }).then(() => {
     return knex.schema.dropTableIfExists('tb_sektor').then(() => {
       return knex.schema.createTable('tb_sektor', (table) => {
         table.increments('id_sektor').primary();
@@ -52,7 +42,7 @@ exports.up = function (knex) {
         table.increments('id_petugas').primary();
         table.integer('id_jabatan').unsigned().references('id_jabatan').inTable('tb_jabatan');
         table.string('id_card');
-        table.integer('id_role').unsigned().references('id_role').inTable('tb_role');
+        table.enum('role', ['Sysadmin', 'Admin', 'Petugas']);
         table.string('nama_lengkap');
         table.string('no_tlp');
         table.string('email');
@@ -82,6 +72,7 @@ exports.up = function (knex) {
     return knex.schema.dropTableIfExists('tb_indikator').then(() => {
       return knex.schema.createTable('tb_indikator', (table) => {
         table.increments('id_indikator').primary();
+        table.integer('id_device').unsigned().references('id_device').inTable('tb_device');
         table.string('nama_indikator');
         table.string('satuan');
         table.integer('minimum');
@@ -122,17 +113,8 @@ exports.up = function (knex) {
         table.timestamps();
         table.engine('InnoDB');
       });
-    });
-  }).then(() => {
-    return knex.schema.dropTableIfExists('tb_detail_indikator').then(() => {
-      return knex.schema.createTable('tb_detail_indikator', (table) => {
-        table.increments('id_detail_indikator').primary();
-        table.integer('id_indikator').unsigned().references('id_indikator').inTable('tb_indikator');
-        table.integer('id_device').unsigned().references('id_device').inTable('tb_device');
-        table.timestamps();
-        table.engine('InnoDB');
-      });
-    });
+    }
+    );
   })
 };
 

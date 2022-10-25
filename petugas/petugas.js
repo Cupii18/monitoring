@@ -20,12 +20,11 @@ router.get('/', async (req, res) => {
                 "petugas.username",
                 "petugas.password",
                 "jabatan.nama_jabatan",
-                "role.nama_role as role",
+                "role",
                 "petugas.created_at",
             )
             .from('tb_petugas as petugas')
             .join('tb_jabatan as jabatan', 'petugas.id_jabatan', 'jabatan.id_jabatan')
-            .join('tb_role as role', 'petugas.id_role', 'role.id_role')
             .where('petugas.status', 'a')
             .modify(function (queryBuilder) {
                 if (req.query.cari) {
@@ -70,13 +69,11 @@ router.get('/:id_petugas', async (req, res) => {
                 "petugas.password",
                 "jabatan.id_jabatan",
                 "jabatan.nama_jabatan",
-                "role.id_role",
-                "role.nama_role",
+                "role",
                 "petugas.created_at",
             )
             .from('tb_petugas as petugas')
             .join('tb_jabatan as jabatan', 'petugas.id_jabatan', 'jabatan.id_jabatan')
-            .join('tb_role as role', 'petugas.id_role', 'role.id_role')
             .where('petugas.status', 'a')
             .where('petugas.id_petugas', req.params.id_petugas)
             .first();
