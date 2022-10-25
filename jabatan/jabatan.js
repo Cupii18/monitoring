@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
                     queryBuilder.where('nama_jabatan', 'like', `%${req.query.cari}%`)
                 }
             }).paginate({
-                perPage: req.query.limit || null,
+                perPage: parseInt(req.query.limit) || null,
                 currentPage: req.query.page || null,
                 isLengthAware: true,
             });
@@ -29,7 +29,6 @@ router.get('/', async (req, res) => {
             total_pages: req.query.limit ? result.pagination.to : null,
             total_data: req.query.limit ? result.pagination.total : null,
         })
-
     } catch (error) {
         return res.status(500).json({
             status: 0,
