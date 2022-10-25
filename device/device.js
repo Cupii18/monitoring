@@ -54,6 +54,8 @@ router.get('/', async (req, res) => {
                 return item.nama_indikator
             })
 
+            result.data[i].indikator = indikator
+
             result.data[i].nama_indikator = result.data[i].nama_indikator.join(', ')
         }
 
@@ -116,7 +118,7 @@ router.put('/:id_device', validasi_data.edit_data, verifikasi_validasi_data, asy
         const cek = await database("tb_device").where("id_device", req.params.id_device).first();
 
         if (cek) {
-            await database("tb_device").where("id_device", req.params.id_device).del();
+            await database("tb_device").where("nama_device", cek.nama_device).del();
             for (let i = 0; i < data.id_indikator.length; i++) {
                 const update = {
                     nama_device: data.nama_device,
