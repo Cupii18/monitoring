@@ -21,8 +21,6 @@ router.get('/', async (req, res) => {
             .modify(function (queryBuilder) {
                 if (req.query.cari) {
                     queryBuilder.where('indikator.nama_indikator', 'like', '%' + req.query.cari + '%')
-                        .orWhere('device.nama_device', 'like', '%' + req.query.cari + '%')
-                        .orWhere('jenis_device.nama_jenis', 'like', '%' + req.query.cari + '%')
                         .orWhere('indikator.satuan', 'like', '%' + req.query.cari + '%')
                 }
             })

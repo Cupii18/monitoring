@@ -64,6 +64,7 @@ exports.up = function (knex) {
         table.integer('minimum');
         table.integer('maksimum');
         table.text('deskripsi');
+        table.string('icon');
         table.enum('status', ['a', 't']);
         table.timestamps();
         table.engine('InnoDB');
