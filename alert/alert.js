@@ -140,14 +140,46 @@ router.delete('/:id_alert', async (req, res) => {
 
 router.get('/:id_alert', async (req, res) => {
     try {
-        const result = await database("tb_alert").select("*").where('id_alert', req.params.id_alert).andWhere('status', 'a').first();
-        if (result) {
-            return res.status(200).json({
-                status: 1,
-                message: "Berhasil",
-                result: result
+        const result = await database
+            .select(
+                "alert.id_alert",
+                "alert.nama_alert",
+                "alert.kondisi",
+                "alert.interval",
+                "alert.status",
+                "alert.tanggal",
+                "device.nama_device",
+                "jenis_device.nama_jenis",
+                "petugas.nama_lengkap",
+                "jabatan.nama_jabatan",
+            )
+            .from('tb_alert as alert')
+            .leftJoin('tb_device as device', 'alert.id_device', 'device.id_device')
+            .leftJoin('tb_jenis_device as jenis_device', 'device.id_jenis_device', 'jenis_device.id_jenis_device')
+            .leftJoin('tb_petugas as petugas', 'alert.id_petugas', 'petugas.id_petugas')
+            .leftJoin('tb_jabatan as jabatan', 'petugas.id_jabatan', 'jabatan.id_jabatan')
+            .where('alert.status', 'a')
+            .andWhare('alert.id_alert', req.params.id_alert)
+            .modify(function (queryBuilder) {
+                if (req.query.cari) {
+                    queryBuilder.where('alert.nama_alert', 'like', '%' + req.query.cari + '%')
+                        .orWhere('device.nama_device', 'like', '%' + req.query.cari + '%')
+                        .orWhere('jenis_device.nama_jenis', 'like', '%' + req.query.cari + '%')
+                }
             })
-        }
+            .paginate({
+                perPage: parseInt(req.query.limit) || 5000,
+                currentPage: req.query.page || null,
+                isLengthAware: true
+            });
+        return res.status(200).json({
+            status: 1,
+            message: "Berhasil",
+            result: result.data,
+            per_page: result.pagination.perPage,
+            total_pages: req.query.limit ? result.pagination.to : null,
+            total_data: req.query.limit ? result.pagination.total : null
+        })
     } catch (error) {
         return res.status(500).json({
             status: 0,
