@@ -8,13 +8,11 @@ router.get('/', async (req, res) => {
     try {
         const result = await database
             .select("*")
-            .from('tb_sektor')
+            .from('tb_role')
             .where('status', 'a')
             .modify(function (queryBuilder) {
                 if (req.query.cari) {
-                    queryBuilder.where('nama_sektor', 'like', `%${req.query.cari}%`)
-                        .orWhere('deskripsi', 'like', `%${req.query.cari}%`)
-                        .orWhere('alamat', 'like', `%${req.query.cari}%`)
+                    queryBuilder.where('nama_role', 'like', `%${req.query.cari}%`)
                 }
             }).paginate({
                 perPage: parseInt(req.query.limit) || 5000,
@@ -22,9 +20,10 @@ router.get('/', async (req, res) => {
                 isLengthAware: true,
             });
 
+
         return res.status(200).json({
             status: 1,
-            message: "berhasil",
+            message: "Berhasil",
             result: result.data,
             per_page: result.pagination.perPage,
             total_pages: req.query.limit ? result.pagination.to : null,
@@ -45,13 +44,13 @@ router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) 
         status: "a"
     }
     try {
-        const simpan = await database("tb_sektor").insert(input);
+        const simpan = await database("tb_role").insert(input);
         if (simpan) {
             return res.status(201).json({
                 status: 1,
                 message: "Berhasil",
                 result: {
-                    id_sektor: simpan[0],
+                    id_role: simpan[0],
                     ...input
                 }
             })
@@ -69,15 +68,12 @@ router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) 
     }
 });
 
-router.put('/:id_sektor', validasi_data.edit_data, verifikasi_validasi_data, async (req, res) => {
+router.put('/:id_role', validasi_data.edit_data, verifikasi_validasi_data, async (req, res) => {
     const data = req.body;
     try {
-        const result = await database("tb_sektor")
-            .where('id_sektor', req.params.id_sektor)
-            .first();
-
+        const result = await database("tb_role").where('id_role', req.params.id_role).first();
         if (result) {
-            await database("tb_sektor").update(data).where('id_sektor', req.params.id_sektor);
+            await database("tb_role").update(data).where('id_role', req.params.id_role);
             return res.status(201).json({
                 status: 1,
                 message: "Berhasil"
@@ -85,7 +81,7 @@ router.put('/:id_sektor', validasi_data.edit_data, verifikasi_validasi_data, asy
         } else {
             return res.status(422).json({
                 status: 0,
-                message: "Data tidak ditemukan",
+                message: "Gagal, data tidak ditemukan",
             })
         }
     } catch (error) {
@@ -96,9 +92,9 @@ router.put('/:id_sektor', validasi_data.edit_data, verifikasi_validasi_data, asy
     }
 });
 
-router.delete('/:id_sektor', async (req, res) => {
+router.delete('/:id_role', async (req, res) => {
     try {
-        const update = await database("tb_sektor").update("status", "t").where('id_sektor', req.params.id_sektor);
+        const update = await database("tb_role").update("status", "t").where('id_role', req.params.id_role);
         if (update) {
             return res.status(201).json({
                 status: 1,
@@ -107,7 +103,7 @@ router.delete('/:id_sektor', async (req, res) => {
         } else {
             return res.status(422).json({
                 status: 0,
-                message: "gagal",
+                message: "Gagal, data tidak ditemukan",
             })
         }
     } catch (error) {
@@ -118,11 +114,11 @@ router.delete('/:id_sektor', async (req, res) => {
     }
 });
 
-router.get('/:id_sektor', async (req, res) => {
+router.get('/:id_role', async (req, res) => {
     try {
-        const result = await database("tb_sektor")
+        const result = await database("tb_role")
             .select("*")
-            .where('id_sektor', req.params.id_sektor)
+            .where('id_role', req.params.id_role)
             .andWhere('status', 'a')
             .first();
 
@@ -131,7 +127,6 @@ router.get('/:id_sektor', async (req, res) => {
             message: "Berhasil",
             result: result || {}
         })
-
     } catch (error) {
         return res.status(500).json({
             status: 0,

@@ -15,21 +15,19 @@ router.get('/', async (req, res) => {
                     queryBuilder.where('nama_jabatan', 'like', `%${req.query.cari}%`)
                 }
             }).paginate({
-                perPage: req.query.limit || null,
+                perPage: parseInt(req.query.limit) || 5000,
                 currentPage: req.query.page || null,
                 isLengthAware: true,
             });
-
 
         return res.status(200).json({
             status: 1,
             message: "Berhasil",
             result: result.data,
-            per_page: result.pagination.perPage,
+            per_page: result.pagination ? result.pagination.perPage : null,
             total_pages: req.query.limit ? result.pagination.to : null,
             total_data: req.query.limit ? result.pagination.total : null,
         })
-
     } catch (error) {
         return res.status(500).json({
             status: 0,

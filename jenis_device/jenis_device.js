@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
                 }
             })
             .paginate({
-                perPage: req.query.limit || null,
+                perPage: parseInt(req.query.limit) || 5000,
                 currentPage: req.query.page || null,
                 isLengthAware: true
             });

@@ -34,7 +34,7 @@ router.get('/', async (req, res) => {
                 }
             })
             .paginate({
-                perPage: req.query.limit || null,
+                perPage: parseInt(req.query.limit) || 5000,
                 currentPage: req.query.page || null,
                 isLengthAware: true
             });
@@ -140,7 +140,7 @@ router.get('/:id_alert', async (req, res) => {
                 message: "berhasil",
                 result: result
             })
-        } 
+        }
     } catch (error) {
         return res.status(500).json({
             status: 0,

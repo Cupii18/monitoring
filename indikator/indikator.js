@@ -4,7 +4,7 @@ const database = require("../config/database");
 const validasi_data = require("./validasi_data");
 const verifikasi_validasi_data = require("../middleware/verifikasi_validasi_data");
 
-router.get('/all', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const result = await database
             .select(
@@ -30,7 +30,7 @@ router.get('/all', async (req, res) => {
                 }
             })
             .paginate({
-                perPage: req.query.limit || null,
+                perPage: parseInt(req.query.limit) || 5000,
                 currentPage: req.query.page || null,
                 isLengthAware: true
             });
