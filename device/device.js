@@ -134,19 +134,40 @@ router.delete('/:id_device', async (req, res) => {
 
 router.get('/:id_device', async (req, res) => {
     try {
-        const result = await database("tb_device").select("*").where('id_device', req.params.id_device).first();
-        if (result) {
-            return res.status(200).json({
-                status: 1,
-                message: "Berhasil",
-                result: result
+        const result = await database
+            .select(
+                "device.id_device",
+                "device.nama_device",
+                "device.deskripsi",
+                "device.status",
+                "jenis_device.nama_jenis",
+                "sektor.nama_sektor",
+            )
+            .from('tb_device as device')
+            .leftJoin('tb_jenis_device as jenis_device', 'device.id_jenis_device', 'jenis_device.id_jenis_device')
+            .leftJoin('tb_sektor as sektor', 'device.id_sektor', 'sektor.id_sektor')
+            .where('device.status', 'a')
+            .andWhare('device.id_device', req.params.id_device)
+            .modify(function (queryBuilder) {
+                if (req.query.cari) {
+                    queryBuilder.where('device.nama_device', 'like', '%' + req.query.cari + '%')
+                        .orWhere('jenis_device.nama_jenis', 'like', '%' + req.query.cari + '%')
+                        .orWhere('sektor.nama_sektor', 'like', '%' + req.query.cari + '%')
+                }
             })
-        } else {
-            return res.status(400).json({
-                status: 0,
-                message: "Data tidak ditemukan",
-            })
-        }
+            .paginate({
+                perPage: parseInt(req.query.limit) || 5000,
+                currentPage: req.query.page || null,
+                isLengthAware: true
+            });
+        return res.status(200).json({
+            status: 1,
+            message: "Berhasil",
+            result: result.data,
+            per_page: result.pagination.perPage,
+            total_pages: req.query.limit ? result.pagination.to : null,
+            total_data: req.query.limit ? result.pagination.total : null
+        })
     } catch (error) {
         return res.status(500).json({
             status: 0,
@@ -154,6 +175,5 @@ router.get('/:id_device', async (req, res) => {
         })
     }
 });
-
 
 module.exports = router;
