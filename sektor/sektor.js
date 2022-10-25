@@ -42,7 +42,9 @@ router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) 
     const data = req.body;
     const input = {
         ...data,
-        status: "a"
+        status: "a",
+        created_at: new Date(),
+        updated_at: new Date()
     }
     try {
         const simpan = await database("tb_sektor").insert(input);
@@ -71,6 +73,7 @@ router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) 
 
 router.put('/:id_sektor', validasi_data.edit_data, verifikasi_validasi_data, async (req, res) => {
     const data = req.body;
+    data.updated_at = new Date();
     try {
         const result = await database("tb_sektor")
             .where('id_sektor', req.params.id_sektor)
@@ -97,8 +100,12 @@ router.put('/:id_sektor', validasi_data.edit_data, verifikasi_validasi_data, asy
 });
 
 router.delete('/:id_sektor', async (req, res) => {
+    const data = {
+        status: "t",
+        updated_at: new Date()
+    }
     try {
-        const update = await database("tb_sektor").update("status", "t").where('id_sektor', req.params.id_sektor);
+        const update = await database("tb_sektor").update(data).where('id_sektor', req.params.id_sektor);
         if (update) {
             return res.status(201).json({
                 status: 1,
@@ -107,7 +114,7 @@ router.delete('/:id_sektor', async (req, res) => {
         } else {
             return res.status(422).json({
                 status: 0,
-                message: "gagal",
+                message: "Gagal",
             })
         }
     } catch (error) {

@@ -56,7 +56,9 @@ router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) 
     const data = req.body;
     const input = {
         ...data,
-        status: "a"
+        status: "a",
+        created_at: new Date(),
+        updated_at: new Date
     }
     try {
         const simpan = await database("tb_indikator").insert(input);
@@ -72,7 +74,7 @@ router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) 
         } else {
             return res.status(422).json({
                 status: 0,
-                message: "gagal simpan",
+                message: "Gagal simpan",
             })
         }
     } catch (error) {
@@ -85,6 +87,7 @@ router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) 
 
 router.put('/:id_indikator', validasi_data.edit_data, verifikasi_validasi_data, async (req, res) => {
     const data = req.body;
+    data.updated_at = new Date();
     try {
         const result = await database("tb_indikator").where('id_indikator', req.params.id_indikator).first();
         if (result) {
@@ -108,17 +111,21 @@ router.put('/:id_indikator', validasi_data.edit_data, verifikasi_validasi_data, 
 });
 
 router.delete('/:id_indikator', async (req, res) => {
+    const data = {
+        status: "t",
+        updated_at: new Date()
+    }
     try {
-        const update = await database("tb_indikator").update("status", "t").where('id_indikator', req.params.id_indikator);
+        const update = await database("tb_indikator").update(data).where('id_indikator', req.params.id_indikator);
         if (update) {
             return res.status(201).json({
                 status: 1,
-                message: "berhasil",
+                message: "Berhasil",
             })
         } else {
             return res.status(422).json({
                 status: 0,
-                message: "gagal",
+                message: "Gagal",
             })
         }
     } catch (error) {
@@ -135,7 +142,7 @@ router.get('/:id_indikator', async (req, res) => {
         if (result) {
             return res.status(200).json({
                 status: 1,
-                message: "berhasil",
+                message: "Berhasil",
                 result: result
             })
         }

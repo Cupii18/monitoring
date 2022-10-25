@@ -103,6 +103,7 @@ router.get('/:id_petugas', async (req, res) => {
 
 router.post('/', validasi_data.register, verifikasi_validasi_data, async (req, res) => {
     const data = req.body;
+    created_at
     try {
         const createTb_petugas = {
             ...data,
@@ -128,75 +129,6 @@ router.post('/', validasi_data.register, verifikasi_validasi_data, async (req, r
         });
     }
 });
-
-// router.post('/login', validasi_data.login, verifikasi_validasi_data, async (req, res) => {
-//     const data = req.body;
-//     try {
-//         const login = await database("tb_petugas").where('username', data.username).first();
-//         if (login) {
-//             if (bcrypt.compareSync(data.password, login.password)) {
-//                 const token = jwt.sign({ id_petugas: login.id_petugas }, "AKU PADAMU SELAMANYA", { expiresIn: '365d' });
-//                 await database("tb_petugas").update('token', token).where('id_petugas', login.id_petugas);
-//                 res.cookie('token', token, {
-//                     httpOnly: true
-//                 })
-//                 return res.status(200).json({
-//                     status: 0,
-//                     message: "selamat datang",
-//                     result: {
-//                         ...data
-//                     }
-//                 })
-//             } else {
-//                 return res.status(400).json({
-//                     status: 0,
-//                     message: "password salah",
-//                 })
-//             }
-//         } else {
-//             return res.status(400).json({
-//                 status: 0,
-//                 message: "username salah",
-//             })
-//         }
-//     } catch (error) {
-//         return res.status(500).json({
-//             status: 0,
-//             message: error.message
-//         })
-//     }
-// });
-
-// router.put('/lupa_password/:id_petugas', async (req, res) => {
-//     const data = req.body;
-//     try {
-//         const kode = await database("tb_petugas").where('tb_petugas', req.params.id_petugas).first();
-//         if (kode) {
-//             if (data.BaruPassword == data.verifikasiPassword) {
-//                 await database("tb_petugas").update('password', bcrypt.hashSync(data.verifikasiPassword, 14)).where('id_petugas', kode.id_petugas);
-//                 return res.status(200).json({
-//                     status: 1,
-//                     message: "Berhasil",
-//                 })
-//             } else {
-//                 return res.status(400).json({
-//                     status: 0,
-//                     message: "password tidak sama",
-//                 })
-//             }
-//         } else {
-//             return res.status(400).json({
-//                 status: 0,
-//                 message: "data tidak ditemukan",
-//             })
-//         }
-//     } catch (error) {
-//         return res.status(500).json({
-//             status: 0,
-//             message: error.message
-//         })
-//     }
-// });
 
 router.delete('/:id_petugas', async (req, res) => {
     try {
@@ -224,40 +156,9 @@ router.delete('/:id_petugas', async (req, res) => {
     }
 });
 
-
-// router.put('/profil/ganti_password/:id_petugas', async (req, res) => {
-//     const data = req.body;
-//     try {
-//         const kode = await database("petugas").where('id_petugas', req.params.id_petugas).first();
-//         if (kode) {
-//             if (data.BaruPassword === data.verifikasiPassword) {
-//                 await database("tb_petugas").update('password', bcrypt.hashSync(data.verifikasiPassword, 14)).where('id_petugas', req.params.id_petugas);
-//                 return res.status(200).json({
-//                     status: 1,
-//                     message: "Berhasil",
-//                 })
-//             } else {
-//                 return res.status(400).json({
-//                     status: 0,
-//                     message: "password tidak sama",
-//                 })
-//             }
-//         } else {
-//             return res.status(400).json({
-//                 status: 0,
-//                 message: "data tidak ditemukan",
-//             })
-//         }
-//     } catch (error) {
-//         return res.status(500).json({
-//             status: 0,
-//             message: error.message
-//         })
-//     }
-// });
-
 router.put('/:id_petugas', async (req, res) => {
     const data = req.body;
+    data.updated_at = new Date();
     try {
         data.updated_at = new Date();
         await database("tb_petugas").update(data).where('id_petugas', req.params.id_petugas);

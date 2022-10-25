@@ -41,11 +41,12 @@ router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) 
     const data = req.body;
     const input = {
         ...data,
-        status: "a"
+        status: "a",
+        created_at: new Date(),
+        updated_at: new Date()
     }
     try {
         const simpan = await database("tb_jenis_device").insert(input);
-
         if (simpan) {
             return res.status(201).json({
                 status: 1,
@@ -71,6 +72,7 @@ router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) 
 
 router.put('/:id_jenis_device', validasi_data.edit_data, verifikasi_validasi_data, async (req, res) => {
     const data = req.body;
+    updated_at = new Date();
     try {
         const result = await database("tb_jenis_device").where('id_jenis_device', req.params.id_jenis_device).first();
         if (result) {
@@ -94,8 +96,12 @@ router.put('/:id_jenis_device', validasi_data.edit_data, verifikasi_validasi_dat
 });
 
 router.delete('/:id_jenis_device', async (req, res) => {
+    const data = {
+        status: "t",
+        updated_at: new Date()
+    }
     try {
-        const update = await database("tb_jenis_device").update("status", "t").where('id_jenis_device', req.params.id_jenis_device);
+        const update = await database("tb_jenis_device").update(data).where('id_jenis_device', req.params.id_jenis_device);
         if (update) {
             return res.status(201).json({
                 status: 1,

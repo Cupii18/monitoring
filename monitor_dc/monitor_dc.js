@@ -27,13 +27,13 @@ router.get('/', async (req, res) => {
         if (result) {
             return res.status(200).json({
                 status: 1,
-                message: "berhasil",
+                message: "Berhasil",
                 result: result
             });
         } else {
             return res.status(400).json({
                 status: 0,
-                message: "data tidak ditemukan"
+                message: "Data tidak ditemukan"
             });
         }
     } catch (error) {
@@ -44,27 +44,5 @@ router.get('/', async (req, res) => {
     }
 });
 
-// router.get('/all', async (req,res) =>{
-//     try {
-//         const result = await database.select("*").from('monitor_dc');
-//         if(result.length > 0){
-//             return res.status(200).json({
-//                 status :1,
-//                 message : "berhasil",
-//                 result : result
-//             })
-//         }else{
-//            return res.status(400).json({
-//                status : 0,
-//                message : "data tidak ditemukan",
-//           })
-//         }   
-//     } catch (error) {
-//         return res.status(500).json({
-//             status : 0,
-//             message : error.message
-//         })
-//     }
-// });
 
 module.exports = router;

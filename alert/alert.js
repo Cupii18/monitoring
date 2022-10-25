@@ -58,7 +58,9 @@ router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) 
     const data = req.body;
     const input = {
         ...data,
-        status: "a"
+        status: "a",
+        created_at: new Date(),
+        updated_at: new Date()
     }
     try {
         const simpan = await database("tb_alert").insert(input);
@@ -74,7 +76,7 @@ router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) 
         } else {
             return res.status(422).json({
                 status: 0,
-                message: "gagal simpan",
+                message: "Gagal simpan",
             })
         }
     } catch (error) {
@@ -87,6 +89,7 @@ router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) 
 
 router.put('/:id_alert', validasi_data.edit_data, verifikasi_validasi_data, async (req, res) => {
     const data = req.body;
+    data.updated_at = new Date();
     try {
         const result = await database("tb_alert").where('id_alert', req.params.id_alert).first();
         if (result) {
@@ -110,8 +113,12 @@ router.put('/:id_alert', validasi_data.edit_data, verifikasi_validasi_data, asyn
 });
 
 router.delete('/:id_alert', async (req, res) => {
+    const data = {
+        status: "t",
+        updated_at: new Date()
+    }
     try {
-        const update = await database("tb_alert").update("status", "t").where('id_alert', req.params.id_alert);
+        const update = await database("tb_alert").update(data).where('id_alert', req.params.id_alert);
         if (update) {
             return res.status(201).json({
                 status: 1,
@@ -137,7 +144,7 @@ router.get('/:id_alert', async (req, res) => {
         if (result) {
             return res.status(200).json({
                 status: 1,
-                message: "berhasil",
+                message: "Berhasil",
                 result: result
             })
         }

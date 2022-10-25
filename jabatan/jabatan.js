@@ -40,7 +40,9 @@ router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) 
     const data = req.body;
     const input = {
         ...data,
-        status: "a"
+        status: "a",
+        created_at: new Date(),
+        updated_at: new Date
     }
     try {
         const simpan = await database("tb_jabatan").insert(input);
@@ -69,6 +71,7 @@ router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) 
 
 router.put('/:id_jabatan', validasi_data.edit_data, verifikasi_validasi_data, async (req, res) => {
     const data = req.body;
+    data.updated_at = new Date();
     try {
         const result = await database("tb_jabatan").where('id_jabatan', req.params.id_jabatan).first();
         if (result) {
@@ -92,8 +95,12 @@ router.put('/:id_jabatan', validasi_data.edit_data, verifikasi_validasi_data, as
 });
 
 router.delete('/:id_jabatan', async (req, res) => {
+    const data = {
+        status: "t",
+        updated_at: new Date()
+    }
     try {
-        const update = await database("tb_jabatan").update("status", "t").where('id_jabatan', req.params.id_jabatan);
+        const update = await database("tb_jabatan").update(data).where('id_jabatan', req.params.id_jabatan);
         if (update) {
             return res.status(201).json({
                 status: 1,
