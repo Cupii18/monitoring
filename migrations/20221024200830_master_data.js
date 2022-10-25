@@ -82,7 +82,6 @@ exports.up = function (knex) {
     return knex.schema.dropTableIfExists('tb_indikator').then(() => {
       return knex.schema.createTable('tb_indikator', (table) => {
         table.increments('id_indikator').primary();
-        table.integer('id_device').unsigned().references('id_device').inTable('tb_device');
         table.string('nama_indikator');
         table.string('satuan');
         table.integer('minimum');
@@ -123,8 +122,17 @@ exports.up = function (knex) {
         table.timestamps();
         table.engine('InnoDB');
       });
-    }
-    );
+    });
+  }).then(() => {
+    return knex.schema.dropTableIfExists('tb_detail_indikator').then(() => {
+      return knex.schema.createTable('tb_detail_indikator', (table) => {
+        table.increments('id_detail_indikator').primary();
+        table.integer('id_indikator').unsigned().references('id_indikator').inTable('tb_indikator');
+        table.integer('id_device').unsigned().references('id_device').inTable('tb_device');
+        table.timestamps();
+        table.engine('InnoDB');
+      });
+    });
   })
 };
 
