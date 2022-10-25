@@ -81,7 +81,7 @@ router.get('/:id_petugas', async (req, res) => {
         if (result) {
             return res.status(200).json({
                 status: 1,
-                message: "berhasil",
+                message: "Berhasil",
                 result: result
             });
         } else {
