@@ -56,12 +56,13 @@ exports.up = function (knex) {
       });
     });
   }).then(() => {
-    return knex.schema.dropTableIfExists('tb_device').then(() => {
-      return knex.schema.createTable('tb_device', (table) => {
-        table.increments('id_device').primary();
-        table.integer('id_jenis_device').unsigned().references('id_jenis_device').inTable('tb_jenis_device');
-        table.integer('id_sektor').unsigned().references('id_sektor').inTable('tb_sektor');
-        table.string('nama_device');
+    return knex.schema.dropTableIfExists('tb_indikator').then(() => {
+      return knex.schema.createTable('tb_indikator', (table) => {
+        table.increments('id_indikator').primary();
+        table.string('nama_indikator');
+        table.string('satuan');
+        table.integer('minimum');
+        table.integer('maksimum');
         table.text('deskripsi');
         table.enum('status', ['a', 't']);
         table.timestamps();
@@ -69,14 +70,13 @@ exports.up = function (knex) {
       });
     });
   }).then(() => {
-    return knex.schema.dropTableIfExists('tb_indikator').then(() => {
-      return knex.schema.createTable('tb_indikator', (table) => {
-        table.increments('id_indikator').primary();
-        table.integer('id_device').unsigned().references('id_device').inTable('tb_device');
-        table.string('nama_indikator');
-        table.string('satuan');
-        table.integer('minimum');
-        table.integer('maksimum');
+    return knex.schema.dropTableIfExists('tb_device').then(() => {
+      return knex.schema.createTable('tb_device', (table) => {
+        table.increments('id_device').primary();
+        table.integer('id_jenis_device').unsigned().references('id_jenis_device').inTable('tb_jenis_device');
+        table.integer('id_sektor').unsigned().references('id_sektor').inTable('tb_sektor');
+        table.integer('id_indikator').unsigned().references('id_indikator').inTable('tb_indikator');
+        table.string('nama_device');
         table.text('deskripsi');
         table.enum('status', ['a', 't']);
         table.timestamps();

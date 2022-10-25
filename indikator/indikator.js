@@ -15,11 +15,8 @@ router.get('/', async (req, res) => {
                 "indikator.maksimum",
                 "indikator.status",
                 "indikator.icon",
-                "device.nama_device",
             )
             .from('tb_indikator as indikator')
-            .leftJoin('tb_device as device', 'indikator.id_device', 'device.id_device')
-            .leftJoin('tb_jenis_device as jenis_device', 'device.id_jenis_device', 'jenis_device.id_jenis_device')
             .where('indikator.status', 'a')
             .modify(function (queryBuilder) {
                 if (req.query.cari) {
@@ -147,12 +144,8 @@ router.get('/:id_indikator', async (req, res) => {
                 "indikator.maksimum",
                 "indikator.status",
                 "indikator.icon",
-                "device.id_device",
-                "device.nama_device",
             )
             .from('tb_indikator as indikator')
-            .leftJoin('tb_device as device', 'indikator.id_device', 'device.id_device')
-            .leftJoin('tb_jenis_device as jenis_device', 'device.id_jenis_device', 'jenis_device.id_jenis_device')
             .where('indikator.status', 'a')
             .andWhere('indikator.id_indikator', req.params.id_indikator)
             .first();
