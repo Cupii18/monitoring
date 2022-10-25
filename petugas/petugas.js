@@ -137,7 +137,7 @@ router.delete('/:id_petugas', async (req, res) => {
         if (update) {
             return res.status(201).json({
                 status: 1,
-                message: "berhasil",
+                message: "Berhasil",
             })
         } else {
             return res.status(400).json({
