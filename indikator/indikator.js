@@ -4,7 +4,7 @@ const database = require("../config/database");
 const validasi_data = require("./validasi_data");
 const verifikasi_validasi_data = require("../middleware/verifikasi_validasi_data");
 
-router.get('/all', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const result = await database
             .select(
