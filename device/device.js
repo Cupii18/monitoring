@@ -40,6 +40,15 @@ router.get('/', async (req, res) => {
                 isLengthAware: true
             });
 
+        return res.status(200).json({
+            status: 1,
+            message: "Berhasil",
+            result: result.data,
+            per_page: result.pagination.perPage,
+            total_pages: req.query.limit ? result.pagination.to : null,
+            total_data: req.query.limit ? result.pagination.total : null,
+        })
+
         for (let i = 0; i < result.data.length; i++) {
             const indikator = await database
                 .select(
@@ -53,7 +62,7 @@ router.get('/', async (req, res) => {
                 )
                 .from('tb_device as device')
                 .leftJoin('tb_indikator as indikator', 'device.id_indikator', 'indikator.id_indikator')
-                .where('device.nama_device', result.data[i].nama_device)
+                .where('device.id_jenis_device', result.data[i].id_jenis_device)
                 .where('indikator.status', 'a')
 
             result.data[i].nama_indikator = indikator.map((item) => {
@@ -97,10 +106,7 @@ router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) 
             return res.status(201).json({
                 status: 1,
                 message: "Berhasil",
-                result: {
-                    id_device: simpan[0],
-                    ...input
-                }
+                result: simpan
             })
         } else {
             return res.status(422).json({
