@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
             .leftJoin('tb_jenis_device as jenis_device', 'device.id_jenis_device', 'jenis_device.id_jenis_device')
             .leftJoin('tb_sektor as sektor', 'device.id_sektor', 'sektor.id_sektor')
             .where('device.status', 'a')
-            .groupBy('device.nama_device')
+            .groupBy('jenis_device.id_jenis_device')
             .modify(function (queryBuilder) {
                 if (req.query.cari) {
                     queryBuilder.where('device.nama_device', 'like', '%' + req.query.cari + '%')
