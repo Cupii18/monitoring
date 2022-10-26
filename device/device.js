@@ -40,15 +40,6 @@ router.get('/', async (req, res) => {
                 isLengthAware: true
             });
 
-        return res.status(200).json({
-            status: 1,
-            message: "Berhasil",
-            result: result.data,
-            per_page: result.pagination.perPage,
-            total_pages: req.query.limit ? result.pagination.to : null,
-            total_data: req.query.limit ? result.pagination.total : null,
-        })
-
         for (let i = 0; i < result.data.length; i++) {
             const indikator = await database
                 .select(
@@ -61,8 +52,8 @@ router.get('/', async (req, res) => {
                     "indikator.icon",
                 )
                 .from('tb_device as device')
-                .leftJoin('tb_indikator as indikator', 'device.id_indikator', 'indikator.id_indikator')
-                .where('device.id_jenis_device', result.data[i].id_jenis_device)
+                .leftJoin('tb_indikator as indikator', 'device.id_device', 'indikator.id_device')
+                .where('device.id_device', result.data[i].id_device)
                 .where('indikator.status', 'a')
 
             result.data[i].nama_indikator = indikator.map((item) => {
@@ -192,13 +183,13 @@ router.get('/:id_device', async (req, res) => {
         const result = await database
             .select(
                 "device.id_device",
+                "device.id_jenis_device",
+                "device.id_sektor",
                 "device.nama_device",
                 "device.deskripsi",
                 "device.status",
                 "jenis_device.nama_jenis",
                 "sektor.nama_sektor",
-                "jenis_device.id_jenis_device",
-                "sektor.id_sektor",
             )
             .from('tb_device as device')
             .leftJoin('tb_jenis_device as jenis_device', 'device.id_jenis_device', 'jenis_device.id_jenis_device')
@@ -207,20 +198,29 @@ router.get('/:id_device', async (req, res) => {
             .where('device.id_device', req.params.id_device)
             .first();
 
-        if (result) {
-            const indikator = await database
-                .select(
-                    "indikator.id_indikator",
-                )
-                .from('tb_device as device')
-                .leftJoin('tb_indikator as indikator', 'device.id_indikator', 'indikator.id_indikator')
-                .where('device.nama_device', result.nama_device)
-                .where('indikator.status', 'a')
+        const indikator = await database
+            .select(
+                "indikator.id_indikator",
+                "indikator.nama_indikator",
+                "indikator.satuan",
+                "indikator.minimum",
+                "indikator.maksimum",
+                "indikator.status",
+                "indikator.icon",
+            )
+            .from('tb_device as device')
+            .leftJoin('tb_indikator as indikator', 'device.id_device', 'indikator.id_device')
+            .where('device.id_device', result.id_device)
+            .where('indikator.status', 'a')
 
-            result.id_indikator = indikator.map((item) => {
-                return item.id_indikator
-            })
-        }
+        result.nama_indikator = indikator.map((item) => {
+            return item.nama_indikator
+        })
+
+        result.indikator = indikator
+
+        result.nama_indikator = result.nama_indikator.join(', ')
+
 
         return res.status(200).json({
             status: 1,

@@ -58,7 +58,7 @@ exports.up = function (knex) {
   }).then(() => {
     return knex.schema.dropTableIfExists('tb_device').then(() => {
       return knex.schema.createTable('tb_device', (table) => {
-        table.string('id_device', [6]).primary().notNullable().unique();
+        table.increments('id_device').primary();
         table.integer('id_jenis_device').unsigned().references('id_jenis_device').inTable('tb_jenis_device');
         table.integer('id_sektor').unsigned().references('id_sektor').inTable('tb_sektor');
         table.string('nama_device');
@@ -72,7 +72,7 @@ exports.up = function (knex) {
     return knex.schema.dropTableIfExists('tb_indikator').then(() => {
       return knex.schema.createTable('tb_indikator', (table) => {
         table.increments('id_indikator').primary();
-        table.string('id_device', [6]).references('id_device').inTable('tb_device');
+        table.integer('id_device').unsigned().references('id_device').inTable('tb_device');
         table.string('nama_indikator');
         table.string('satuan');
         table.integer('minimum');
@@ -89,7 +89,7 @@ exports.up = function (knex) {
       return knex.schema.createTable('tb_alert', (table) => {
         table.increments('id_alert').primary();
         table.integer('id_petugas').unsigned().references('id_petugas').inTable('tb_petugas');
-        table.string('id_device', [6]).references('id_device').inTable('tb_device');
+        table.integer('id_device').unsigned().references('id_device').inTable('tb_device');
         table.string('nama_alert');
         table.string('kondisi');
         table.integer('interval');
@@ -104,7 +104,7 @@ exports.up = function (knex) {
     return knex.schema.dropTableIfExists('monitor_dc').then(() => {
       return knex.schema.createTable('monitor_dc', (table) => {
         table.increments('id_monitor_dc').primary();
-        table.string('id_device', [6]).references('id_device').inTable('tb_device');
+        table.integer('id_device').unsigned().references('id_device').inTable('tb_device');
         table.float('tegangan').nullable();
         table.float('arus').nullable();
         table.float('watt').nullable();
