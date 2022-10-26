@@ -27,6 +27,12 @@ router.get('/', async (req, res) => {
                         .orWhere('sektor.nama_sektor', 'like', '%' + req.query.cari + '%')
                         .orWhere('indikator.nama_indikator', 'like', '%' + req.query.cari + '%')
                 }
+
+                if (req.query.sektor) {
+                    if (req.query.sektor != 'all') {
+                        queryBuilder.where('device.id_sektor', req.query.sektor)
+                    }
+                }
             })
             .paginate({
                 perPage: parseInt(req.query.limit) || 5000,
@@ -216,6 +222,28 @@ router.get('/:id_device', async (req, res) => {
             result: result
         })
 
+    } catch (error) {
+        return res.status(500).json({
+            status: 0,
+            message: error.message
+        })
+    }
+});
+
+router.get('/list/filter', async (req, res) => {
+    try {
+        const result = await database
+            .select(
+                'nama_sektor as text',
+                'id_sektor as value'
+            )
+            .from('tb_sektor')
+            .where('status', 'a')
+            .orderBy('nama_sektor', 'asc');
+
+        return res.status(200).json({
+            sektor: result
+        })
     } catch (error) {
         return res.status(500).json({
             status: 0,

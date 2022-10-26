@@ -100,7 +100,6 @@ router.get('/:id_petugas', async (req, res) => {
 
 router.post('/', validasi_data.register, verifikasi_validasi_data, async (req, res) => {
     const data = req.body;
-    created_at
     try {
         const createTb_petugas = {
             ...data,

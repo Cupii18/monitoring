@@ -73,7 +73,7 @@ exports.up = function (knex) {
   }).then(() => {
     return knex.schema.dropTableIfExists('tb_device').then(() => {
       return knex.schema.createTable('tb_device', (table) => {
-        table.increments('id_device').primary();
+        table.string('id_device', [6]).primary().notNullable().unique();
         table.integer('id_jenis_device').unsigned().references('id_jenis_device').inTable('tb_jenis_device');
         table.integer('id_sektor').unsigned().references('id_sektor').inTable('tb_sektor');
         table.integer('id_indikator').unsigned().references('id_indikator').inTable('tb_indikator');
@@ -89,7 +89,7 @@ exports.up = function (knex) {
       return knex.schema.createTable('tb_alert', (table) => {
         table.increments('id_alert').primary();
         table.integer('id_petugas').unsigned().references('id_petugas').inTable('tb_petugas');
-        table.integer('id_device').unsigned().references('id_device').inTable('tb_device');
+        table.string('id_device').references('id_device').inTable('tb_device');
         table.string('nama_alert');
         table.string('kondisi');
         table.integer('interval');
@@ -104,7 +104,7 @@ exports.up = function (knex) {
     return knex.schema.dropTableIfExists('monitor_dc').then(() => {
       return knex.schema.createTable('monitor_dc', (table) => {
         table.increments('id_monitor_dc').primary();
-        table.integer('id_device').unsigned().references('id_device').inTable('tb_device');
+        table.string('id_device').references('id_device').inTable('tb_device');
         table.float('tegangan').nullable();
         table.float('arus').nullable();
         table.float('watt').nullable();
