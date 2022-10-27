@@ -48,13 +48,13 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
     try {
         // Split string
-        const sensor = req.query.sensor.split(", ");
+        const sensor = req.query.sensor.split(", ") || req.body.sensor.split(", ");
         const checkDevice = await database("tb_device")
             .join("tb_jenis_device", "tb_device.id_jenis_device", "tb_jenis_device.id_jenis_device")
             .join("tb_sektor", "tb_device.id_sektor", "tb_sektor.id_sektor")
             .where("tb_device.nama_device", sensor[0])
             .where("tb_jenis_device.nama_jenis", sensor[1])
-            .where("tb_sektor.nama_sektor", req.query.lokasi)
+            .where("tb_sektor.nama_sektor", req.query.lokasi ? req.query.lokasi : req.body.lokasi)
             .select("tb_device.id_device")
             .first();
 
@@ -67,11 +67,11 @@ router.post('/', async (req, res) => {
 
         const data = {
             id_device: checkDevice.id_device,
-            tegangan: parseFloat(req.query.tegangan),
-            arus: parseFloat(req.query.arus),
-            watt: parseFloat(req.query.watt),
-            kwh: parseFloat(req.query.kwh),
-            status: req.query.status,
+            tegangan: parseFloat(req.query.tegangan ? req.query.tegangan : req.body.tegangan),
+            arus: parseFloat(req.query.arus ? req.query.arus : req.body.arus),
+            watt: parseFloat(req.query.watt ? req.query.watt : req.body.watt),
+            kwh: parseFloat(req.query.kwh ? req.query.kwh : req.body.kwh),
+            status: req.query.status ? req.query.status : req.body.status,
             waktu: new Date(),
             created_at: new Date(),
             updated_at: new Date()
