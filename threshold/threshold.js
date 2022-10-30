@@ -12,17 +12,16 @@ router.get('/', async (req, res) => {
             .select(
                 "threshold.id_threshold",
                 "threshold.minimum",
-                "threshold.maksimum",                                                               
+                "threshold.maksimum",
                 "threshold.status",
                 "indikator.nama_indikator",
                 "device.nama_device",
             )
-            .from('tb_threshold as threshold')
+            .from("tb_threshold as threshold")
             .leftJoin('tb_indikator as indikator', 'threshold.id_indikator', 'indikator.id_indikator')
             .leftJoin("tb_device as device", "threshold.id_device", "indikator.id_device")
             .where('threshold.status', 'a')
             .groupBy('indikator.id_indikator')
-            .andWhere('threshold.id_threshold', req.params.id_threshold)
             .modify(function (queryBuilder) {
                 if (req.query.cari) {
                     queryBuilder.where('threshold.minimum', 'like', '%' + req.query.cari + '%')

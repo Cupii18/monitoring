@@ -114,8 +114,21 @@ exports.up = function (knex) {
         table.timestamps();
         table.engine('InnoDB');
       });
-    }
-    );
+    });
+  }).then(() => {
+    // Threshold
+    return knex.schema.dropTableIfExists('tb_threshold').then(() => {
+      return knex.schema.createTable('tb_threshold', (table) => {
+        table.increments('id_threshold').primary();
+        table.integer('id_device').unsigned().references('id_device').inTable('tb_device');
+        table.integer('id_indikator').unsigned().references('id_indikator').inTable('tb_indikator');
+        table.integer('minimum');
+        table.integer('maksimum');
+        table.enum('status', ['a', 't']);
+        table.timestamps();
+        table.engine('InnoDB');
+      });
+    });
   })
 };
 
