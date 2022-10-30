@@ -4,52 +4,54 @@ const database = require("../config/database");
 const validasi_data = require("./validasi_data");
 const verifikasi_validasi_data = require("../middleware/verifikasi_validasi_data");
 
-//kurang get all, get one, sama verifikasi email
 
-// router.get('/', async (req, res) => {
-//     try {
-//         const result = await database
-//             .select(
-//                 "indikator.id_indikator",
-//                 "indikator.nama_indikator",
-//                 "indikator.satuan",
-//                 "indikator.minimum",
-//                 "indikator.maksimum",
-//                 "indikator.status",
-//                 "indikator.icon",
-//                 "device.nama_device",
-//             )
-//             .from('tb_indikator as indikator')
-//             .leftJoin('tb_device as device', 'indikator.id_device', 'device.id_device')
-//             .where('indikator.status', 'a')
-//             .modify(function (queryBuilder) {
-//                 if (req.query.cari) {
-//                     queryBuilder.where('indikator.nama_indikator', 'like', '%' + req.query.cari + '%')
-//                         .orWhere('indikator.satuan', 'like', '%' + req.query.cari + '%')
-//                 }
-//             })
-//             .paginate({
-//                 perPage: parseInt(req.query.limit) || 5000,
-//                 currentPage: req.query.page || null,
-//                 isLengthAware: true
-//             });
+router.get('/', async (req, res) => {
+    try {
+        const result = await database
+            .select(
+                "report.id_report",
+                "report.nama_report",
+                "report.periode",
+                "report.interval",
+                "report.email",
+                "report.waktu",
+                "indikator.nama_indikator",
+                "device.nama_device",
+            )
+            .from("tb_report as report")
+            .leftJoin('tb_indikator as indikator', 'report.id_indikator', 'indikator.id_indikator')
+            .leftJoin("tb_device as device", "report.id_device", "indikator.id_device")
+            .where('report.status', 'a')
+            .groupBy('indikator.id_indikator')
+            .modify(function (queryBuilder) {
+                if (req.query.cari) {
+                    queryBuilder.where('report.nama_report', 'like', '%' + req.query.cari + '%')
+                        .orWhere('report.nama_device', 'like', '%' + req.query.cari + '%')
+                        .orWhere('report.nama_indikator', 'like', '%' + req.query.cari + '%')
+                }
+            })
+            .paginate({
+                perPage: parseInt(req.query.limit) || 5000,
+                currentPage: req.query.page || null,
+                isLengthAware: true
+            });
 
-//         return res.status(200).json({
-//             status: 1,
-//             message: "Berhasil",
-//             result: result.data,
-//             per_page: result.pagination.perPage,
-//             total_pages: req.query.limit ? result.pagination.to : null,
-//             total_data: req.query.limit ? result.pagination.total : null
-//         })
+        return res.status(200).json({
+            status: 1,
+            message: "Berhasil",
+            result: result.data,
+            per_page: result.pagination.perPage,
+            total_pages: req.query.limit ? result.pagination.to : null,
+            total_data: req.query.limit ? result.pagination.total : null
+        })
 
-//     } catch (error) {
-//         return res.status(500).json({
-//             status: 0,
-//             message: error.message
-//         })
-//     }
-// });
+    } catch (error) {
+        return res.status(500).json({
+            status: 0,
+            message: error.message
+        })
+    }
+});
 
 router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) => {
     const data = req.body;
@@ -135,37 +137,37 @@ router.delete('/:id_report', async (req, res) => {
     }
 });
 
-// router.get('/:id_report', async (req, res) => {
-//     try {
-//         const result = await database
-//             .select(
-//                 "indikator.id_indikator",
-//                 "indikator.nama_indikator",
-//                 "indikator.satuan",
-//                 "indikator.minimum",
-//                 "indikator.maksimum",
-//                 "indikator.status",
-//                 "indikator.icon",
-//                 "device.id_device",
-//             )
-//             .from('tb_indikator as indikator')
-//             .leftJoin('tb_device as device', 'indikator.id_device', 'device.id_device')
-//             .where('indikator.status', 'a')
-//             .andWhere('indikator.id_indikator', req.params.id_indikator)
-//             .first();
+router.get('/:id_report', async (req, res) => {
+    try {
+        const result = await database
+        .select(
+            "report.id_report",
+            "report.nama_report",
+            "report.periode",
+            "report.interval",
+            "report.email",
+            "report.waktu",
+            "indikator.nama_indikator",
+            "device.nama_device",
+            )
+        .from("tb_report as report")
+        .leftJoin('tb_indikator as indikator', 'report.id_indikator', 'indikator.id_indikator')
+        .leftJoin("tb_device as device", "report.id_device", "indikator.id_device")
+        .where('report.status', 'a')
+        .first();
 
-//         return res.status(200).json({
-//             status: 1,
-//             message: "Berhasil",
-//             result: result
-//         })
-//     } catch (error) {
-//         return res.status(500).json({
-//             status: 0,
-//             message: error.message
-//         })
-//     }
-// });
+        return res.status(200).json({
+            status: 1,
+            message: "Berhasil",
+            result: result
+        })
+    } catch (error) {
+        return res.status(500).json({
+            status: 0,
+            message: error.message
+        })
+    }
+});
 
 // router.post('/verifikasi/email',async(req,res)=>{
 //     const data = req.body;

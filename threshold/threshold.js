@@ -138,21 +138,19 @@ router.delete('/:id_threshold', async (req, res) => {
 router.get('/:id_threshold', async (req, res) => {
     try {
         const result = await database
-            .select(
-                "threshold.id_threshold",
-                "threshold.minimum",
-                "threshold.maksimum",
-                "threshold.status",
-                "indikator.nama_indikator",
-                "device.nama_device",
-            )
-            .from('tb_threshold as threshold')
-            .leftJoin('tb_indikator as indikator', 'threshold.id_indikator', 'indikator.id_indikator')
-            .leftJoin("tb_device as device", "threshold.id_device", "device.id_device")
-            .where('threshold.status', 'a')
-            .groupBy('indikator.id_indikator')
-            .andWhere('threshold.id_threshold', req.params.id_threshold)
-            .first();
+        .select(
+            "threshold.id_threshold",
+            "threshold.minimum",
+            "threshold.maksimum",
+            "threshold.status",
+            "indikator.nama_indikator",
+            "device.nama_device",
+        )
+        .from("tb_threshold as threshold")
+        .leftJoin('tb_indikator as indikator', 'threshold.id_indikator', 'indikator.id_indikator')
+        .leftJoin("tb_device as device", "threshold.id_device", "indikator.id_device")
+        .where('threshold.status', 'a')
+        .first();
 
         return res.status(200).json({
             status: 1,
