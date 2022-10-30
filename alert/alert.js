@@ -59,6 +59,7 @@ router.post('/', validasi_data.data, verifikasi_validasi_data, async (req, res) 
     const input = {
         ...data,
         status: "a",
+        tanggal: new Date(),
         created_at: new Date(),
         updated_at: new Date()
     }
@@ -165,7 +166,7 @@ router.get('/:id_alert', async (req, res) => {
             .where('alert.status', 'a')
             .andWhare('alert.id_alert', req.params.id_alert)
             .first();
-            
+
         return res.status(200).json({
             status: 1,
             message: "Berhasil",
