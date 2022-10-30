@@ -10,11 +10,12 @@ router.get('/', async (req, res) => {
                 'tb_device.nama_device',
                 'tb_jenis_device.nama_jenis',
                 'monitor_dc.waktu',
-                'monitor_dc.tegangan',
-                'monitor_dc.arus',
-                'monitor_dc.watt',
-                'monitor_dc.kwh',
+                database.raw('CAST(monitor_dc.tegangan AS DECIMAL(10,2)) AS tegangan'),
+                database.raw('CAST(monitor_dc.arus AS DECIMAL(10,2)) AS arus'),
+                database.raw('CAST(monitor_dc.watt AS DECIMAL(10,2)) AS watt'),
+                database.raw('CAST(monitor_dc.kwh AS DECIMAL(10,2)) AS kwh'),
                 'tb_indikator.nama_indikator',
+                'tb_indikator.icon',
                 'tb_indikator.satuan'
             )
             .from('monitor_dc')
