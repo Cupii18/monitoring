@@ -13,14 +13,15 @@ router.get('/', async (req, res) => {
                 "report.nama_report",
                 "report.periode",
                 "report.interval",
-                "report.email",
                 "report.waktu",
                 "indikator.nama_indikator",
                 "device.nama_device",
+                "petugas.nama_lengkap"
             )
             .from("tb_report as report")
             .leftJoin('tb_indikator as indikator', 'report.id_indikator', 'indikator.id_indikator')
             .leftJoin("tb_device as device", "report.id_device", "indikator.id_device")
+            .leftJoin("tb_petugas as petugas", "report.id_petugas", "petugas.id_petugas")
             .where('report.status', 'a')
             .groupBy('indikator.id_indikator')
             .modify(function (queryBuilder) {
@@ -28,6 +29,7 @@ router.get('/', async (req, res) => {
                     queryBuilder.where('report.nama_report', 'like', '%' + req.query.cari + '%')
                         .orWhere('report.nama_device', 'like', '%' + req.query.cari + '%')
                         .orWhere('report.nama_indikator', 'like', '%' + req.query.cari + '%')
+                        .orWhere('report.nama_lengkap', 'like', '%' + req.query.cari + '%')
                 }
             })
             .paginate({
@@ -145,14 +147,15 @@ router.get('/:id_report', async (req, res) => {
             "report.nama_report",
             "report.periode",
             "report.interval",
-            "report.email",
             "report.waktu",
             "indikator.nama_indikator",
             "device.nama_device",
+            "petugas.nama_lengkap"
             )
         .from("tb_report as report")
         .leftJoin('tb_indikator as indikator', 'report.id_indikator', 'indikator.id_indikator')
         .leftJoin("tb_device as device", "report.id_device", "indikator.id_device")
+        .leftJoin("tb_petugas as petugas", "report.id_petugas", "petugas.id_petugas")
         .where('report.status', 'a')
         .first();
 
@@ -168,27 +171,5 @@ router.get('/:id_report', async (req, res) => {
         })
     }
 });
-
-// router.post('/verifikasi/email',async(req,res)=>{
-//     const data = req.body;
-//     try {
-//         const email = await database("tb_report").where('email', data.email).first();
-//         if (email) {
-//             transporter.sendEmail(async(err, info) =>{
-//                 if (err) {
-//                     return res.status(201).json({
-//                         status: 0,
-
-//                     })
-//                 }
-//             })
-//         }
-//     } catch (error) {
-//         return res.status(500).json({
-//             status : 0,
-//             message : error.message
-//         })
-//     }
-
 
 module.exports = router;
