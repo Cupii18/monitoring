@@ -164,7 +164,7 @@ router.get('/:id_alert', async (req, res) => {
             .leftJoin('tb_petugas as petugas', 'alert.id_petugas', 'petugas.id_petugas')
             .leftJoin('tb_jabatan as jabatan', 'petugas.id_jabatan', 'jabatan.id_jabatan')
             .where('alert.status', 'a')
-            .andWhare('alert.id_alert', req.params.id_alert)
+            .andWhere('alert.id_alert', req.params.id_alert)
             .first();
 
         return res.status(200).json({
