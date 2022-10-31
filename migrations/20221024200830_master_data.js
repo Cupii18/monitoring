@@ -129,6 +129,23 @@ exports.up = function (knex) {
         table.engine('InnoDB');
       });
     });
+  }).then(() => {
+    // report
+    return knex.schema.dropTableIfExists('tb_report').then(() => {
+      return knex.schema.createTable('tb_report', (table) => {
+        table.increments('id_report').primary();
+        table.integer('id_device').unsigned().references('id_device').inTable('tb_device');
+        table.integer('id_indikator').unsigned().references('id_indikator').inTable('tb_indikator');
+        table.integer('id_petugas').unsigned().references('id_petugas').inTable('tb_petugas');
+        table.string('nama_report');
+        table.date('periode');
+        table.integer('interval');
+        table.enum('waktu', ['Daily', 'Weekly', 'Monthly']);
+        table.enum('status', ['a', 't']);
+        table.timestamps();
+        table.engine('InnoDB');
+      });
+    });
   })
 };
 

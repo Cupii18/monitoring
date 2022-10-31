@@ -23,7 +23,8 @@ router.get('/', async (req, res) => {
             .join('tb_jenis_device', 'tb_device.id_jenis_device', 'tb_jenis_device.id_jenis_device')
             .join('tb_indikator', 'tb_device.id_device', 'tb_indikator.id_device')
             .join('tb_sektor', 'tb_device.id_sektor', 'tb_sektor.id_sektor')
-            .groupBy('monitor_dc.id_device', 'tb_indikator.id_indikator', 'tb_jenis_device.id_jenis_device')
+            .orderBy('monitor_dc.id_monitor_dc', 'desc')
+            .groupBy('tb_device.id_device', 'tb_jenis_device.id_jenis_device', 'tb_indikator.id_indikator', 'monitor_dc.id_monitor_dc')
 
         if (result) {
             return res.status(200).json({
