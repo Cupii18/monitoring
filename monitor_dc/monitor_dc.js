@@ -4,35 +4,6 @@ const database = require("../config/database");
 
 router.get('/', async (req, res) => {
     try {
-        // const result = await database
-        //     .select(
-        //         database.raw('max(monitor_dc.id_monitor_dc) as id_monitor_dc'),
-        //         database.raw('max(monitor_dc.waktu) as waktu'),
-        //         database.raw('max(tb_device.nama_device) as nama_device'),
-        //         database.raw('max(tb_device.id_device) as id_device'),
-        //         database.raw('max(tb_jenis_device.nama_jenis) as nama_jenis'),
-        //         database.raw('max(tb_jenis_device.id_jenis_device) as id_jenis_device'),
-        //         database.raw('max(monitor_dc.waktu) as waktu'),
-        //         database.raw('max(monitor_dc.tegangan) as tegangan'),
-        //         database.raw('max(monitor_dc.kwh) as kwh'),
-        //         database.raw('max(monitor_dc.watt) as watt'),
-        //         database.raw('max(monitor_dc.arus) as arus'),
-        //         database.raw('max(tb_indikator.nama_indikator) as nama_indikator'),
-        //         database.raw('max(tb_indikator.id_indikator) as id_indikator'),
-        //         database.raw('max(tb_indikator.satuan) as satuan'),
-        //         database.raw('max(tb_indikator.icon) as icon'),
-        //         database.raw('max(tb_indikator.satuan) as satuan'),
-        //         database.raw('max(tb_indikator.minimum) as minimum'),
-        //         database.raw('max(tb_indikator.maksimum) as maksimum'),
-        //     )
-        //     .from('monitor_dc')
-        //     .join('tb_device', 'monitor_dc.id_device', 'tb_device.id_device')
-        //     .join('tb_jenis_device', 'tb_device.id_jenis_device', 'tb_jenis_device.id_jenis_device')
-        //     .join('tb_indikator', 'tb_device.id_device', 'tb_indikator.id_device')
-        //     .join('tb_sektor', 'tb_device.id_sektor', 'tb_sektor.id_sektor')
-        //     .orderBy('monitor_dc.id_monitor_dc', 'desc')
-        //     .groupBy('tb_jenis_device.id_jenis_device', 'tb_indikator.id_indikator', 'tb_device.id_device')
-
         const result = await database
             .select(
                 'monitor_dc.id_monitor_dc',
@@ -71,8 +42,6 @@ router.get('/', async (req, res) => {
 
 
         for (let i = 0; i < result.length; i++) {
-            console.log(result[i].arus);
-            console.log(result[i].watt);
             const checkBatas = await database
                 .select(
                     'tb_threshold.id_threshold',
