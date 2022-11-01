@@ -6,7 +6,7 @@ const knex = require('knex')({
     user: 'root',
     password: '',
     database: 'monitoring',
-    timezone: 'UTC'
+    timezone: '+00:00'
   }
 });
 

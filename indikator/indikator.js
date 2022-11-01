@@ -10,6 +10,7 @@ router.get('/', async (req, res) => {
             .select(
                 "indikator.id_indikator",
                 "indikator.nama_indikator",
+                "jenis_device.nama_jenis",
                 "indikator.satuan",
                 "indikator.minimum",
                 "indikator.maksimum",
@@ -19,6 +20,7 @@ router.get('/', async (req, res) => {
             )
             .from('tb_indikator as indikator')
             .leftJoin('tb_device as device', 'indikator.id_device', 'device.id_device')
+            .leftJoin('tb_jenis_device as jenis_device', 'device.id_jenis_device', 'jenis_device.id_jenis_device')
             .where('indikator.status', 'a')
             .modify(function (queryBuilder) {
                 if (req.query.cari) {
@@ -39,6 +41,37 @@ router.get('/', async (req, res) => {
             per_page: result.pagination.perPage,
             total_pages: req.query.limit ? result.pagination.to : null,
             total_data: req.query.limit ? result.pagination.total : null
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            status: 0,
+            message: error.message
+        })
+    }
+});
+
+// Get All indikator by id Device
+router.get('/device/:id_device', async (req, res) => {
+    try {
+        const result = await database
+            .select(
+                "indikator.id_indikator",
+                "indikator.nama_indikator",
+                "indikator.satuan",
+                "indikator.minimum",
+                "indikator.maksimum",
+                "indikator.status",
+                "indikator.icon",
+            )
+            .from('tb_indikator as indikator')
+            .where('indikator.status', 'a')
+            .where('indikator.id_device', req.params.id_device)
+
+        return res.status(200).json({
+            status: 1,
+            message: "Berhasil",
+            result: result,
         })
 
     } catch (error) {

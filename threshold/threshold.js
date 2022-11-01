@@ -4,8 +4,6 @@ const database = require("../config/database");
 const validasi_data = require("./validasi_data");
 const verifikasi_validasi_data = require("../middleware/verifikasi_validasi_data");
 
-
-//kurang get all dan get one
 router.get('/', async (req, res) => {
     try {
         const result = await database
@@ -16,12 +14,13 @@ router.get('/', async (req, res) => {
                 "threshold.status",
                 "indikator.nama_indikator",
                 "device.nama_device",
+                "jenis_device.nama_jenis",
             )
             .from("tb_threshold as threshold")
             .leftJoin('tb_indikator as indikator', 'threshold.id_indikator', 'indikator.id_indikator')
-            .leftJoin("tb_device as device", "threshold.id_device", "indikator.id_device")
+            .leftJoin("tb_device as device", "indikator.id_device", "device.id_device")
+            .leftJoin("tb_jenis_device as jenis_device", "device.id_jenis_device", "jenis_device.id_jenis_device")
             .where('threshold.status', 'a')
-            .groupBy('indikator.id_indikator')
             .modify(function (queryBuilder) {
                 if (req.query.cari) {
                     queryBuilder.where('threshold.minimum', 'like', '%' + req.query.cari + '%')
@@ -138,19 +137,22 @@ router.delete('/:id_threshold', async (req, res) => {
 router.get('/:id_threshold', async (req, res) => {
     try {
         const result = await database
-        .select(
-            "threshold.id_threshold",
-            "threshold.minimum",
-            "threshold.maksimum",
-            "threshold.status",
-            "indikator.nama_indikator",
-            "device.nama_device",
-        )
-        .from("tb_threshold as threshold")
-        .leftJoin('tb_indikator as indikator', 'threshold.id_indikator', 'indikator.id_indikator')
-        .leftJoin("tb_device as device", "threshold.id_device", "indikator.id_device")
-        .where('threshold.status', 'a')
-        .first();
+            .select(
+                "threshold.id_threshold",
+                "threshold.minimum",
+                "threshold.maksimum",
+                "threshold.status",
+                "indikator.nama_indikator",
+                "device.id_device",
+                "indikator.id_indikator",
+                "device.nama_device",
+            )
+            .from("tb_threshold as threshold")
+            .leftJoin('tb_indikator as indikator', 'threshold.id_indikator', 'indikator.id_indikator')
+            .leftJoin("tb_device as device", "device.id_device", "indikator.id_device")
+            .where('threshold.status', 'a')
+            .where('threshold.id_threshold', req.params.id_threshold)
+            .first();
 
         return res.status(200).json({
             status: 1,

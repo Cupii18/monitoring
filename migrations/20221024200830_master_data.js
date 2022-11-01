@@ -120,7 +120,6 @@ exports.up = function (knex) {
     return knex.schema.dropTableIfExists('tb_threshold').then(() => {
       return knex.schema.createTable('tb_threshold', (table) => {
         table.increments('id_threshold').primary();
-        table.integer('id_device').unsigned().references('id_device').inTable('tb_device');
         table.integer('id_indikator').unsigned().references('id_indikator').inTable('tb_indikator');
         table.integer('minimum');
         table.integer('maksimum');
@@ -134,7 +133,6 @@ exports.up = function (knex) {
     return knex.schema.dropTableIfExists('tb_report').then(() => {
       return knex.schema.createTable('tb_report', (table) => {
         table.increments('id_report').primary();
-        table.integer('id_device').unsigned().references('id_device').inTable('tb_device');
         table.integer('id_indikator').unsigned().references('id_indikator').inTable('tb_indikator');
         table.integer('id_petugas').unsigned().references('id_petugas').inTable('tb_petugas');
         table.string('nama_report');
