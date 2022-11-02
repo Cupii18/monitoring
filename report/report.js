@@ -3,6 +3,10 @@ const router = express.Router();
 const database = require("../config/database");
 const validasi_data = require("./validasi_data");
 const verifikasi_validasi_data = require("../middleware/verifikasi_validasi_data");
+const fs = require('fs');
+const puppeteer = require('puppeteer');
+const mustache = require('mustache');
+const path = require("path");
 
 
 router.get('/', async (req, res) => {
@@ -142,28 +146,76 @@ router.delete('/:id_report', async (req, res) => {
 router.get('/:id_report', async (req, res) => {
     try {
         const result = await database
-        .select(
-            "report.id_report",
-            "report.nama_report",
-            "report.periode",
-            "report.interval",
-            "report.waktu",
-            "indikator.nama_indikator",
-            "device.nama_device",
-            "petugas.nama_lengkap"
+            .select(
+                "report.id_report",
+                "report.nama_report",
+                "report.periode",
+                "report.interval",
+                "report.waktu",
+                "indikator.nama_indikator",
+                "device.nama_device",
+                "petugas.nama_lengkap"
             )
-        .from("tb_report as report")
-        .leftJoin('tb_indikator as indikator', 'report.id_indikator', 'indikator.id_indikator')
-        .leftJoin("tb_device as device", "report.id_device", "indikator.id_device")
-        .leftJoin("tb_petugas as petugas", "report.id_petugas", "petugas.id_petugas")
-        .where('report.status', 'a')
-        .first();
+            .from("tb_report as report")
+            .leftJoin('tb_indikator as indikator', 'report.id_indikator', 'indikator.id_indikator')
+            .leftJoin("tb_device as device", "report.id_device", "indikator.id_device")
+            .leftJoin("tb_petugas as petugas", "report.id_petugas", "petugas.id_petugas")
+            .where('report.status', 'a')
+            .first();
 
         return res.status(200).json({
             status: 1,
             message: "Berhasil",
             result: result
         })
+    } catch (error) {
+        return res.status(500).json({
+            status: 0,
+            message: error.message
+        })
+    }
+});
+
+// export pdf
+router.get('/export/pdf', async (req, res) => {
+    try {
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+
+        const htmlBody = fs.readFileSync(path.join(__dirname, 'main.html'), 'utf8');
+        const data = {
+            title: "Report",
+            data: [
+                {
+                    id_report: 1,
+                    nama_report: "Report 1",
+                    periode: "2020-01-01",
+                    interval: "1",
+                    waktu: "2020-01-01 00:00:00",
+                    nama_indikator: "Indikator 1",
+                    nama_device: "Device 1",
+                    nama_lengkap: "Petugas 1"
+                },
+                {
+                    id_report: 2,
+                    nama_report: "Report 2",
+                    periode: "2020-01-01",
+                    interval: "1",
+                    waktu: "2020-01-01 00:00:00",
+                    nama_indikator: "Indikator 2",
+                    nama_device: "Device 2",
+                    nama_lengkap: "Petugas 2"
+                },
+            ]
+        };
+
+        await page.setContent(mustache.render(htmlBody, data));
+        const pdf = await page.pdf({ format: 'A4' });
+        fs.writeFileSync("./report.pdf", pdf);
+        browser.close();
+
+        res.contentType("application/pdf");
+        return res.send(pdf);
     } catch (error) {
         return res.status(500).json({
             status: 0,
