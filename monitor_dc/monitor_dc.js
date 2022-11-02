@@ -40,6 +40,25 @@ router.get('/', async (req, res) => {
             )
             .orderBy('monitor_dc.id_monitor_dc', 'desc')
             .groupBy('tb_jenis_device.id_jenis_device', 'tb_indikator.id_indikator', 'tb_device.id_device')
+            .modify(function (queryBuilder) {
+                if (req.query.indikator) {
+                    if (req.query.indikator != 'all') {
+                        queryBuilder.where('tb_indikator.nama_indikator', req.query.indikator);
+                    }
+                }
+
+                if (req.query.jenis_device) {
+                    if (req.query.jenis_device != 'all') {
+                        queryBuilder.where('tb_jenis_device.id_jenis_device', req.query.jenis_device);
+                    }
+                }
+
+                if (req.query.sektor) {
+                    if (req.query.sektor != 'all') {
+                        queryBuilder.where('tb_sektor.id_sektor', req.query.sektor);
+                    }
+                }
+            })
 
 
         for (let i = 0; i < result.length; i++) {
@@ -160,10 +179,9 @@ router.post('/', async (req, res) => {
                 arus: parseFloat(req.body.arus),
                 watt: parseFloat(req.body.watt),
                 kwh: parseFloat(req.body.kwh),
-                status: req.body.status,
-                waktu: new Date(),
-                created_at: new Date(),
-                updated_at: new Date()
+                waktu: moment().format("YYYY-MM-DDTHH:mm:ss.SSS"),
+                created_at: moment().format("YYYY-MM-DDTHH:mm:ss.SSS"),
+                updated_at: moment().format("YYYY-MM-DDTHH:mm:ss.SSS")
             }
 
             const insert = await database("monitor_dc").insert(data);
@@ -184,6 +202,49 @@ router.post('/', async (req, res) => {
                 message: "Nama dan jenis device tidak dapat ditemukan"
             })
         }
+    } catch (error) {
+        return res.status(500).json({
+            status: 0,
+            message: error.message
+        })
+    }
+});
+
+router.get('/list/filter', async (req, res) => {
+    try {
+        const listSektor = await database
+            .select(
+                'nama_sektor as text',
+                'id_sektor as value'
+            )
+            .from('tb_sektor')
+            .where('status', 'a')
+            .orderBy('nama_sektor', 'asc');
+
+        const listIndikator = await database
+            .select(
+                'nama_indikator as text',
+                'nama_indikator as value'
+            )
+            .from('tb_indikator')
+            .where('status', 'a')
+            .orderBy('nama_indikator', 'asc')
+            .groupBy('nama_indikator');
+
+        const listJenis = await database
+            .select(
+                'nama_jenis as text',
+                'id_jenis_device as value'
+            )
+            .from('tb_jenis_device')
+            .where('status', 'a')
+            .orderBy('nama_jenis', 'asc');
+
+        return res.status(200).json({
+            sektor: listSektor,
+            indikator: listIndikator,
+            jenis_device: listJenis
+        })
     } catch (error) {
         return res.status(500).json({
             status: 0,
