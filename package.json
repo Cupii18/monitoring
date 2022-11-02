@@ -28,9 +28,10 @@
     "knex": "^2.3.0",
     "knex-paginate": "^3.0.1",
     "moment": "^2.29.4",
+    "mustache": "^4.2.0",
     "mysql2": "^2.3.3",
     "nodemailer": "^6.8.0",
     "nodemon": "^2.0.20",
-    "puppeteer": "^19.2.0"
+    "puppeteer": "^19.2.1"
   }
 }
