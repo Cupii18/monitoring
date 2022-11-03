@@ -16,24 +16,20 @@ router.get('/', async (req, res) => {
                 "report.id_report",
                 "report.nama_report",
                 "report.periode",
-                "report.interval",
-                "report.waktu",
                 "indikator.nama_indikator",
                 "device.nama_device",
-                "petugas.nama_lengkap"
+                "petugas.email"
             )
             .from("tb_report as report")
             .leftJoin('tb_indikator as indikator', 'report.id_indikator', 'indikator.id_indikator')
-            .leftJoin("tb_device as device", "report.id_device", "indikator.id_device")
+            .leftJoin('tb_device as device', 'indikator.id_device', 'device.id_device')
             .leftJoin("tb_petugas as petugas", "report.id_petugas", "petugas.id_petugas")
             .where('report.status', 'a')
-            .groupBy('indikator.id_indikator')
             .modify(function (queryBuilder) {
                 if (req.query.cari) {
                     queryBuilder.where('report.nama_report', 'like', '%' + req.query.cari + '%')
                         .orWhere('report.nama_device', 'like', '%' + req.query.cari + '%')
                         .orWhere('report.nama_indikator', 'like', '%' + req.query.cari + '%')
-                        .orWhere('report.nama_lengkap', 'like', '%' + req.query.cari + '%')
                 }
             })
             .paginate({
@@ -150,17 +146,19 @@ router.get('/:id_report', async (req, res) => {
                 "report.id_report",
                 "report.nama_report",
                 "report.periode",
-                "report.interval",
-                "report.waktu",
+                "indikator.id_indikator",
                 "indikator.nama_indikator",
+                "device.id_device",
                 "device.nama_device",
-                "petugas.nama_lengkap"
+                "petugas.id_petugas",
+                "petugas.email"
             )
             .from("tb_report as report")
             .leftJoin('tb_indikator as indikator', 'report.id_indikator', 'indikator.id_indikator')
-            .leftJoin("tb_device as device", "report.id_device", "indikator.id_device")
+            .leftJoin('tb_device as device', 'indikator.id_device', 'device.id_device')
             .leftJoin("tb_petugas as petugas", "report.id_petugas", "petugas.id_petugas")
             .where('report.status', 'a')
+            .where('report.id_report', req.params.id_report)
             .first();
 
         return res.status(200).json({

@@ -137,8 +137,6 @@ exports.up = function (knex) {
         table.integer('id_petugas').unsigned().references('id_petugas').inTable('tb_petugas');
         table.string('nama_report');
         table.date('periode');
-        table.integer('interval');
-        table.enum('waktu', ['Daily', 'Weekly', 'Monthly']);
         table.enum('status', ['a', 't']);
         table.timestamps();
         table.engine('InnoDB');
