@@ -6,6 +6,12 @@
 	<link rel="stylesheet" type="text/css" href="main.css">
 	<link rel="stylesheet" href="report.js">
 	<style>
+		* {
+			box-sizing: border-box;
+			font-family: Arial, Helvetica, sans-serif;
+			font-size: 8px;
+		}
+
 		h1,
 		h3 {
 			text-align: center;
@@ -13,7 +19,6 @@
 		}
 
 		table {
-			font-family: Arial, Helvetica, sans-serif;
 			border-collapse: collapse;
 			width: 100%;
 		}
@@ -33,11 +38,9 @@
 		}
 
 		th {
-			padding-top: 12px;
-			padding-bottom: 12px;
+			padding-top: 10px;
+			padding-bottom: 10px;
 			text-align: left;
-			background-color: #4CAF50;
-			color: white;
 		}
 	</style>
 </head>
@@ -47,61 +50,35 @@
 		<h1>Report Monitoring</h1>
 		<table class="table">
 			<tr>
-				<th>No</th>
+				<th>Timestamp</th>
 				<th>Nama Device</th>
 				<th>Jenis Device</th>
 				<th>Nama Indikator</th>
+				<th>Tegangan</th>
 				<th>Status</th>
-				<th>Waktu</th>
 			</tr>
+			{{ #data }}
 			<tr>
-				<td>1</td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
+				<td>
+					{{ waktu }}
+				</td>
+				<td>
+					{{ nama_device }}
+				</td>
+				<td>
+					{{ nama_jenis }}
+				</td>
+				<td>
+					{{ nama_indikator }}
+				</td>
+				<td>
+					{{ arus }}
+				</td>
+				<td>
+					{{ status }}
+				</td>
 			</tr>
-			<tr>
-				<td>2</td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>3</td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>4</td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>5</td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>6</td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
+			{{ /data }}
 		</table>
 	</main>
 </body>
