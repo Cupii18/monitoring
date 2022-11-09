@@ -347,10 +347,11 @@ router.post('/export', async (req, res) => {
             format: 'A4',
         });
         fs.writeFileSync("./report.pdf",await pdfDoc.save);
-        browser.close();
-
-        res.contentType("application/pdf");
         return res.send(pdf);
+        // browser.close();
+
+        // res.contentType("application/pdf");
+        // return res.send(pdf);
     } catch (error) {
         return res.status(500).json({
             status: 0,
