@@ -5,7 +5,7 @@ const knex = require('knex')({
     port: 3306,
     user: 'root',
     password: '',
-    database: 'monitoring',
+    database: 'belanj_pic',
     timezone: '+00:00'
   }
 });
