@@ -363,6 +363,49 @@ function SocketRouter(io) {
     }
   });
 
+  router.get('/list/filter', async (req, res) => {
+    try {
+      const listSektor = await database
+        .select(
+          'nama_sektor as text',
+          'id_sektor as value'
+        )
+        .from('tb_sektor')
+        .where('status', 'a')
+        .orderBy('nama_sektor', 'asc');
+
+      const listIndikator = await database
+        .select(
+          'nama_indikator as text',
+          'nama_indikator as value'
+        )
+        .from('tb_indikator')
+        .where('status', 'a')
+        .orderBy('nama_indikator', 'asc')
+        .groupBy('nama_indikator');
+
+      const listJenis = await database
+        .select(
+          'nama_jenis as text',
+          'id_jenis_device as value'
+        )
+        .from('tb_jenis_device')
+        .where('status', 'a')
+        .orderBy('nama_jenis', 'asc');
+
+      return res.status(200).json({
+        sektor: listSektor,
+        indikator: listIndikator,
+        jenis_device: listJenis
+      })
+    } catch (error) {
+      return res.status(500).json({
+        status: 0,
+        message: error.message
+      })
+    }
+  });
+
   return router;
 }
 

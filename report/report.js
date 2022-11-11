@@ -4,8 +4,8 @@ const database = require("../config/database");
 const validasi_data = require("./validasi_data");
 const verifikasi_validasi_data = require("../middleware/verifikasi_validasi_data");
 const fs = require('fs');
-const {PDFDocument} = require('pdf-lib');
-const path = require("path");
+const PDFDocument = require('./pdfkit-tables.js');
+// const path = require("path");
 const moment = require("moment/moment");
 
 
@@ -174,7 +174,7 @@ router.get('/:id_report', async (req, res) => {
     }
 });
 
-router.post('/export', async (req, res) => {
+router.post('/export/pdf', async (req, res) => {
     try {
         const result = await database
             .select(
@@ -323,7 +323,7 @@ router.post('/export', async (req, res) => {
 
         const report = monitor.map((item) => {
             return {
-                waktu: moment(item.waktu).format('D MMMM YYYY HH:mm:ss'),
+                waktu: moment.utc(item.waktu).format('D MMM YYYY HH:mm:ss'),
                 nama_device: item.nama_device,
                 nama_jenis: item.nama_jenis,
                 nama_indikator: item.nama_indikator,
@@ -331,27 +331,41 @@ router.post('/export', async (req, res) => {
                 status: item.status == 'danger' ? 'Danger' : 'Warning'
             }
         })
+        const doc = new PDFDocument();
 
-        const {PDFDocument} = require('pdf-lib')
-        const doc = await PDFDocument.create()
-        const page = doc.addPage
+        doc
+            .fillColor("#444444")
+            .fontSize(20)
+            .text(req.body.nama_report, 110, 57, { align: "center" })
+            .fontSize(10)
+            .moveDown();
 
-        const htmlBody = fs.readFileSync(path.join(__dirname, 'main.html'), 'utf8');
-        const data = {
-            title: "Report",
-            data: report,
+        const table = {
+            headers: ["Waktu", "Device", "Jenis Device", "Indikator", "Arus", "Status"],
+            rows: []
         };
 
-        await page.drawText(render(htmlBody, data));
-        const pdf = await page.pdf({
-            format: 'A4',
-        });
-        fs.writeFileSync("./report.pdf",await pdfDoc.save);
-        return res.send(pdf);
-        // browser.close();
+        for (const monitor of report) {
+            table.rows.push([
+                monitor.waktu,
+                monitor.nama_device,
+                monitor.nama_jenis,
+                monitor.nama_indikator,
+                monitor.arus,
+                monitor.status
+            ])
+        }
 
-        // res.contentType("application/pdf");
-        // return res.send(pdf);
+        // Draw the table
+        doc.moveDown().table(table, 10, 125, { width: 590 });
+
+        // Finalize the PDF and end the stream
+        doc.end();
+
+        // Send the PDF to the browser
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", `attachment; filename="patients.pdf"`);
+        doc.pipe(res);
     } catch (error) {
         return res.status(500).json({
             status: 0,
