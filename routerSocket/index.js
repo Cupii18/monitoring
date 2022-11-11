@@ -135,21 +135,27 @@ async function getDataMonitor(req) {
 async function getStatistic(req) {
   const result = await database
     .select(
-      database.raw('CONCAT (tb_device.nama_device, " - ", tb_jenis_device.nama_jenis) as name'),
       'tb_device.id_device',
+      'tb_device.nama_device',
       'tb_jenis_device.id_jenis_device',
+      'tb_indikator.id_indikator',
+      'tb_indikator.nama_indikator as name',
+      'tb_indikator.satuan',
     )
     .from('monitor_dc')
     .join('tb_device', 'monitor_dc.id_device', 'tb_device.id_device')
     .join('tb_jenis_device', 'tb_device.id_jenis_device', 'tb_jenis_device.id_jenis_device')
-    .join('tb_indikator', 'tb_device.id_device', 'tb_indikator.id_indikator')
+    .join('tb_indikator', 'tb_device.id_device', 'tb_indikator.id_device')
     .join('tb_sektor', 'tb_device.id_sektor', 'tb_sektor.id_sektor')
     .orderBy('monitor_dc.id_monitor_dc', 'desc')
-    .groupBy('tb_jenis_device.id_jenis_device', 'tb_indikator.id_indikator', 'tb_device.id_device')
+    .groupBy('tb_indikator.satuan')
 
   for (let i = 0; i < result.length; i++) {
     const data = await database
       .select(
+        'tb_indikator.satuan',
+        'tb_device.nama_device',
+        'tb_jenis_device.nama_jenis',
         'monitor_dc.id_monitor_dc',
         'monitor_dc.id_device',
         'monitor_dc.waktu',
@@ -161,45 +167,30 @@ async function getStatistic(req) {
       .from('monitor_dc')
       .join('tb_device', 'monitor_dc.id_device', 'tb_device.id_device')
       .join('tb_jenis_device', 'tb_device.id_jenis_device', 'tb_jenis_device.id_jenis_device')
-      .join('tb_indikator', 'tb_device.id_device', 'tb_indikator.id_indikator')
+      .join('tb_indikator', 'tb_device.id_device', 'tb_indikator.id_device')
       .join('tb_sektor', 'tb_device.id_sektor', 'tb_sektor.id_sektor')
-      .where('monitor_dc.id_device', result[i].id_device)
-      .where('tb_jenis_device.id_jenis_device', result[i].id_jenis_device)
+      .where('tb_indikator.satuan', result[i].satuan)
       .orderBy('monitor_dc.id_monitor_dc', 'desc')
       .groupByRaw('DATE_FORMAT(monitor_dc.waktu, "%Y-%m-%d %H:%i")')
       .limit(100)
-    // .modify(function (queryBuilder) {
-    //   if (req != null) {
-    //     if (req.query.indikator) {
-    //       if (req.query.indikator == 'Arus Listrik') {
-    //         queryBuilder.select('monitor_dc.arus as value');
-    //       } else if (req.query.indikator == 'Daya') {
-    //         queryBuilder.select('monitor_dc.watt as value');
-    //       } else if (req.query.indikator == 'Energy') {
-    //         queryBuilder.select('monitor_dc.kwh as value');
-    //       } else if (req.query.indikator == 'Voltage') {
-    //         queryBuilder.select('monitor_dc.tegangan as value');
-    //       } else {
-    //         queryBuilder.select('monitor_dc.arus as value');
-    //       }
-    //     } else {
-    //       queryBuilder.select('monitor_dc.arus as value');
-    //     }
-    //   } else {
-    //     queryBuilder.select('monitor_dc.arus as value');
-    //   }
-    // })
+      .modify(function (queryBuilder) {
+        if (req != null) {
+          if (req.query.device) {
+            queryBuilder.where('monitor_dc.id_device', req.query.device)
+          }
 
+          if (req.query.jenis_device) {
+            queryBuilder.where('tb_jenis_device.id_jenis_device', req.query.jenis_device)
+          } else {
+            queryBuilder.where('tb_jenis_device.id_jenis_device', 1)
+          }
 
-    // if (req != null) {
-    //   if (req.query.indikator) {
-    //     result[i].indikator = req.query.indikator != 'all' ? req.query.indikator : 'Arus Listrik';
-    //   } else {
-    //     result[i].indikator = 'Arus Listrik';
-    //   }
-    // } else {
-    //   result[i].indikator = 'Arus Listrik';
-    // }
+          if (req.query.sektor) {
+            queryBuilder.where('tb_sektor.id_sektor', req.query.sektor)
+          }
+        }
+      })
+
 
     result[i].data = data.map((item) => {
       const date = moment.utc(item.waktu, 'YYYY-MM-DDTHH:mm:ss.SSS').format('YYYY-MM-DD HH:mm:ss')
@@ -207,16 +198,45 @@ async function getStatistic(req) {
 
       return {
         waktu: unix,
-        arus: item.arus,
-        watt: item.watt,
-        kwh: item.kwh,
-        tegangan: item.tegangan,
+        arus: item.satuan == 'A' ? item.arus : item.satuan == 'W' ? item.watt : item.satuan == 'Wh' ? item.kwh : item.tegangan,
+        satuan: item.satuan,
+        device: item.nama_device + ' - ' + item.nama_jenis,
       }
     })
-
   }
 
-  return result;
+  const title = await database
+    .select(
+      database.raw('CONCAT(tb_device.nama_device, " - ", tb_jenis_device.nama_jenis) as title'),
+    )
+    .from('monitor_dc')
+    .join('tb_device', 'monitor_dc.id_device', 'tb_device.id_device')
+    .join('tb_jenis_device', 'tb_device.id_jenis_device', 'tb_jenis_device.id_jenis_device')
+    .join('tb_indikator', 'tb_device.id_device', 'tb_indikator.id_device')
+    .join('tb_sektor', 'tb_device.id_sektor', 'tb_sektor.id_sektor')
+    .orderBy('monitor_dc.id_monitor_dc', 'desc')
+    .groupBy('tb_indikator.satuan')
+    .modify(function (queryBuilder) {
+      if (req != null) {
+        if (req.query.device) {
+          queryBuilder.where('monitor_dc.id_device', req.query.device)
+        }
+
+        if (req.query.jenis_device) {
+          queryBuilder.where('tb_jenis_device.id_jenis_device', req.query.jenis_device)
+        } else {
+          queryBuilder.where('tb_jenis_device.id_jenis_device', 1)
+        }
+      }
+    })
+    .first()
+
+  const data = {
+    data: result,
+    title: title.title,
+  }
+
+  return data;
 }
 
 function SocketRouter(io) {
@@ -291,8 +311,7 @@ function SocketRouter(io) {
 
             return res.status(200).json({
               status: 1,
-              message: "Berhasil",
-              result: result
+              message: "Berhasil"
             });
           } else {
             return res.status(400).json({
@@ -315,7 +334,7 @@ function SocketRouter(io) {
     } catch (error) {
       return res.status(500).json({
         status: 0,
-        message: error.message
+        message: error.message,
       })
     }
   });
@@ -327,7 +346,8 @@ function SocketRouter(io) {
         return res.status(200).json({
           status: 1,
           message: "Berhasil",
-          result: result
+          result: result.data,
+          title: result.title
         });
       } else {
         return res.status(400).json({
