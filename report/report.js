@@ -4,8 +4,7 @@ const database = require("../config/database");
 const validasi_data = require("./validasi_data");
 const verifikasi_validasi_data = require("../middleware/verifikasi_validasi_data");
 const fs = require('fs');
-const puppeteer = require('puppeteer');
-const mustache = require('mustache');
+const {PDFDocument} = require('pdf-lib');
 const path = require("path");
 const moment = require("moment/moment");
 
@@ -333,8 +332,9 @@ router.post('/export', async (req, res) => {
             }
         })
 
-        const browser = await puppeteer.launch();
-        const page = await browser.newPage();
+        const {PDFDocument} = require('pdf-lib')
+        const doc = await PDFDocument.create()
+        const page = doc.addPage
 
         const htmlBody = fs.readFileSync(path.join(__dirname, 'main.html'), 'utf8');
         const data = {
@@ -342,15 +342,16 @@ router.post('/export', async (req, res) => {
             data: report,
         };
 
-        await page.setContent(mustache.render(htmlBody, data));
+        await page.drawText(render(htmlBody, data));
         const pdf = await page.pdf({
             format: 'A4',
         });
-        fs.writeFileSync("./report.pdf", pdf);
-        browser.close();
-
-        res.contentType("application/pdf");
+        fs.writeFileSync("./report.pdf",await pdfDoc.save);
         return res.send(pdf);
+        // browser.close();
+
+        // res.contentType("application/pdf");
+        // return res.send(pdf);
     } catch (error) {
         return res.status(500).json({
             status: 0,
