@@ -362,12 +362,12 @@ router.post('/export/pdf', async (req, res) => {
         doc.end();
 
         var transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com",
+            host: "...",
             port: 465,
             secure: true,
             auth: {
-                user: 'monitoringelectrical@gmail.com',
-                pass: 'jutoefwhvbcolwtp'
+                user: '...',
+                pass: '...'
             }
         });
 
@@ -375,7 +375,7 @@ router.post('/export/pdf', async (req, res) => {
 
         // send mail with file
         var mailOptions = {
-            from: 'monitoringelectrical@gmail.com',
+            from: '...',
             to: user.email,
             subject: 'Report',
             text: 'Report',

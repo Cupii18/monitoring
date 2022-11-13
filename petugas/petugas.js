@@ -142,12 +142,12 @@ router.post('/', validasi_data.register, verifikasi_validasi_data, async (req, r
 
             const nodemailer = require("nodemailer");
             const transporter = nodemailer.createTransport({
-                host: "smtp.gmail.com",
+                host: "...",
                 port: 465,
                 secure: true,
                 auth: {
-                    user: 'monitoringelectrical@gmail.com',
-                    pass: 'jutoefwhvbcolwtp'
+                    user: '...',
+                    pass: '..'
                 }
             });
 
