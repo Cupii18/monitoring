@@ -3,9 +3,9 @@ const router = express.Router();
 const database = require("../config/database");
 const bcrypt = require("bcrypt");
 const upload = require("./multer");
-const email = require("../config/email");
 const path = require("path");
 const fs = require("fs");
+const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const validasi_data = require("./validasi_data");
 const verifikasi_validasi_data = require("../middleware/verifikasi_validasi_data");
@@ -130,17 +130,7 @@ router.post('/', validasi_data.register, verifikasi_validasi_data, async (req, r
         const simpan = await database("tb_petugas").insert(createTb_petugas);
 
         if (simpan) {
-            // const send = email.sendEmail(data.email, "Register",
-            //     `
-            //         <h1>Register</h1>
-            //         <p>Username: ${account.username}</p>
-            //         <p>Password: ${account.password}</p>
-            //         <br />
-            //         <p>Silahkan login ke aplikasi</p>
-            //     `
-            // );
 
-            const nodemailer = require("nodemailer");
             const transporter = nodemailer.createTransport({
                 host: "...",
                 port: 465,
@@ -187,27 +177,6 @@ router.post('/', validasi_data.register, verifikasi_validasi_data, async (req, r
                     })
                 }
             });
-
-
-            // if (send) {
-            //     return res.status(201).json({
-            //         status: 1,
-            //         message: "Berhasil",
-            //         result: {
-            //             id_petugas: simpan[0],
-            //             ...createTb_petugas
-            //         }
-            //     })
-            // } else {
-            //     await database("tb_petugas").where("id_petugas", simpan[0]).del();
-
-            //     return res.status(500).json({
-            //         status: 0,
-            //         message: "Gagal mengirim email",
-            //         data: send
-            //     })
-            // }
-
         }
     } catch (error) {
         return res.status(500).json({
