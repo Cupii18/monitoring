@@ -21,14 +21,11 @@ module.exports.register = [
                     return Promise.reject('No Tlp sudah ada');
                 }
             })
-        }),
-    check('username').not().isEmpty().withMessage('Username tidak boleh kosong').isLength({ min: 5 }).withMessage('Username minimal 5 karakter')
-        .custom((value, { req }) => {
-            return database.select('*').from('tb_petugas').where('username', value).then((data) => {
-                if (data.length > 0) {
-                    return Promise.reject('Username tidak tersedia');
-                }
-            })
-        }),
-    check('password').not().isEmpty().withMessage('Password tidak boleh kosong').isLength({ min: 6 }).withMessage('Password minimal 6 karakter'),
+        })
+];
+
+
+module.exports.login = [
+    check('username').not().isEmpty().withMessage('Username tidak boleh kosong'),
+    check('password').not().isEmpty().withMessage('Password tidak boleh kosong')
 ]

@@ -1,4 +1,5 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 const cors = require("cors");
 const helmet = require("helmet");
 const PORT = process.env.PORT || 8000;
@@ -35,8 +36,8 @@ app.use(cors());
 app.options("*", cors());
 app.use(helmet());
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // socket router
 const socketRouter = require("./routerSocket")(io);

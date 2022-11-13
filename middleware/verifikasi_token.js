@@ -9,7 +9,7 @@ module.exports = async (req, res, next) => {
             message: "Tidak ada token"
         })
     }
-    jwt.verify(authHeaders, "AKU PADAMU SELAMANYA", (err, decoded) => {
+    jwt.verify(authHeaders, "T0P_S3CR3t", (err, decoded) => {
         if (err) {
             return res.status(400).json({
                 status: 0,

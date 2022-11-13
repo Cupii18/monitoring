@@ -3,9 +3,8 @@ const router = express.Router();
 const database = require("../config/database");
 const validasi_data = require("./validasi_data");
 const verifikasi_validasi_data = require("../middleware/verifikasi_validasi_data");
-const fs = require('fs');
 const PDFDocument = require('./pdfkit-tables.js');
-// const path = require("path");
+const nodemailer = require('nodemailer');
 const moment = require("moment/moment");
 
 
@@ -362,10 +361,59 @@ router.post('/export/pdf', async (req, res) => {
         // Finalize the PDF and end the stream
         doc.end();
 
-        // Send the PDF to the browser
-        res.setHeader("Content-Type", "application/pdf");
-        res.setHeader("Content-Disposition", `attachment; filename="patients.pdf"`);
-        doc.pipe(res);
+        var transporter = nodemailer.createTransport({
+            host: "smtp.gmail.com",
+            port: 465,
+            secure: true,
+            auth: {
+                user: 'monitoringelectrical@gmail.com',
+                pass: 'jutoefwhvbcolwtp'
+            }
+        });
+
+        const user = await database('tb_petugas').where('id_petugas', req.body.id_petugas).first()
+
+        // send mail with file
+        var mailOptions = {
+            from: 'monitoringelectrical@gmail.com',
+            to: user.email,
+            subject: 'Report',
+            text: 'Report',
+            attachments: [{
+                filename: 'report.pdf',
+                content: doc
+            }]
+        };
+
+        transporter.sendMail(mailOptions, async (err, info) => {
+            if (err) {
+                res.status(400).json({
+                    message: 'Email gagal dikirim',
+                    error: err
+                })
+            } else {
+                const data = {
+                    id_indikator: req.body.id_indikator,
+                    id_petugas: req.body.id_petugas,
+                    nama_report: req.body.nama_report,
+                    periode: req.body.periode,
+                    status: 'a',
+                    created_at: moment().format('YYYY-MM-DDTHH:mm:ss'),
+                    updated_at: moment().format('YYYY-MM-DDTHH:mm:ss')
+                }
+                if (req.body.id_report) {
+                    await database('tb_report').where('id_report', req.body.id_report).update(data)
+                } else {
+                    await database('tb_report').insert(data)
+                }
+
+                return res.status(200).json({
+                    status: 'success',
+                    message: 'Email berhasil dikirim',
+                })
+            }
+        });
+
     } catch (error) {
         return res.status(500).json({
             status: 0,
