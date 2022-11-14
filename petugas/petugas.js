@@ -455,7 +455,7 @@ router.post('/reset-password', async (req, res) => {
 router.post('/verify-captcha', async (req, res) => {
     try {
         const data = req.body;
-        const secretKey = '6LcR_QYjAAAAAAuqRoH-uoGINpaZAUMneX_8OovP';
+        const secretKey = '...';
         const verifyUrl = `https://google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${data.response}`;
 
         request(verifyUrl, (err, response, body) => {
