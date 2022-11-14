@@ -10,6 +10,7 @@ const jwt = require("jsonwebtoken");
 const validasi_data = require("./validasi_data");
 const verifikasi_validasi_data = require("../middleware/verifikasi_validasi_data");
 const verifikasi_token = require("../middleware/verifikasi_token");
+const { request } = require("https");
 
 router.get('/', verifikasi_token, async (req, res) => {
     try {
@@ -449,6 +450,36 @@ router.post('/reset-password', async (req, res) => {
         })
     }
 });
+
+// Verify Recaptcha
+router.post('/verify-captcha', async (req, res) => {
+    try {
+        const data = req.body;
+        const secretKey = '6LcR_QYjAAAAAAuqRoH-uoGINpaZAUMneX_8OovP';
+        const verifyUrl = `https://google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${data.response}`;
+
+        request(verifyUrl, (err, response, body) => {
+            body = JSON.parse(body);
+            if (body.success !== undefined && !body.success) {
+                return res.status(401).json({
+                    status: 0,
+                    message: "Failed captcha verification"
+                });
+            } else {
+                return res.status(200).json({
+                    status: 1,
+                    message: "Success"
+                });
+            }
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: 0,
+            message: error.message
+        })
+    }
+});
+
 
 
 
