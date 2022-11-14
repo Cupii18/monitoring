@@ -9,18 +9,4 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-exports.sendEmail = (email, subject, message) => {
-  const mailOptions = {
-    from: 'Electrical Monitoring',
-    to: email,
-    subject: subject,
-    html: message
-  };
-  transporter.sendMail(mailOptions, (err, info) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log(info);
-    }
-  });
-};
+exports.transporter = transporter;

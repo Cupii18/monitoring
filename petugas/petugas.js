@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const upload = require("./multer");
 const path = require("path");
 const fs = require("fs");
-const nodemailer = require("nodemailer");
+const transporter = require("../config/email").transporter;
 const jwt = require("jsonwebtoken");
 const validasi_data = require("./validasi_data");
 const verifikasi_validasi_data = require("../middleware/verifikasi_validasi_data");
@@ -130,18 +130,6 @@ router.post('/', validasi_data.register, verifikasi_validasi_data, async (req, r
         const simpan = await database("tb_petugas").insert(createTb_petugas);
 
         if (simpan) {
-
-            const transporter = nodemailer.createTransport({
-                host: "...",
-                port: 465,
-                secure: true,
-                auth: {
-                    user: '...',
-                    pass: '..'
-                }
-            });
-
-
             const mailOptions = {
                 from: 'Electrical Monitoring',
                 to: data.email,
@@ -157,7 +145,6 @@ router.post('/', validasi_data.register, verifikasi_validasi_data, async (req, r
 
             transporter.sendMail(mailOptions, async (err, info) => {
                 if (err) {
-
                     await database("tb_petugas").where("id_petugas", simpan[0]).del();
 
                     return res.status(500).json({
@@ -314,6 +301,155 @@ router.post('/login', validasi_data.login, verifikasi_validasi_data, async (req,
         })
     }
 });
+
+// Logout
+router.post('/logout', async (req, res) => {
+    try {
+        const token = req.headers.authorization;
+        const result = await database('tb_petugas').update({
+            token: null,
+            updated_at: new Date()
+        }).where('token', token);
+
+        if (result) {
+            return res.status(200).json({
+                status: 1,
+                message: "Berhasil"
+            });
+        } else {
+            return res.status(401).json({
+                status: 0,
+                message: "Gagal"
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: 0,
+            message: error.message
+        })
+    }
+});
+
+// Forgot Password
+router.post('/forgot-password', async (req, res) => {
+    try {
+        const data = req.body;
+        const result = await database('tb_petugas').where('email', data.email).first();
+        if (result) {
+            const kode_verifikasi = Math.floor(100000 + Math.random() * 900000);
+
+            // Assign to jwt token
+            const token = jwt.sign({
+                id_petugas: result.id_petugas,
+                kode_verifikasi: kode_verifikasi
+            }, "T0P_S3CR3t", { expiresIn: '1h' });
+
+            // Simpan token ke database
+            await database('tb_petugas').update({
+                token: token,
+                updated_at: new Date()
+            }).where('id_petugas', result.id_petugas);
+
+            // Kirim email
+            const mailOptions = {
+                from: '..',
+                to: data.email,
+                subject: 'Kode Verifikasi',
+                html: `<h1>Kode Verifikasi</h1>
+                <p>Kode verifikasi anda adalah <b>${kode_verifikasi}</b></p>`
+            };
+
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    return res.status(500).json({
+                        status: 0,
+                        message: error.message
+                    })
+                } else {
+                    return res.status(200).json({
+                        status: 1,
+                        message: "Berhasil"
+                    });
+                }
+            });
+        } else {
+            return res.status(404).json({
+                status: 0,
+                message: "Email tidak ditemukan"
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: 0,
+            message: error.message
+        })
+    }
+});
+
+// verifikasi
+router.post('/verifikasi', async (req, res) => {
+    try {
+        const data = req.body;
+        // cek token dengan yang ada di database
+        const result = await database('tb_petugas').where('email', data.email).first();
+        if (result) {
+            const token = result.token;
+            const decode = jwt.verify(token, "T0P_S3CR3t");
+            if (decode.kode_verifikasi == data.code) {
+                return res.status(200).json({
+                    status: 1,
+                    message: "Berhasil"
+                });
+            } else {
+                return res.status(401).json({
+                    status: 0,
+                    message: "Kode verifikasi salah"
+                });
+            }
+        } else {
+            return res.status(401).json({
+                status: 0,
+                message: "Token tidak ditemukan"
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: 0,
+            message: error.message
+        })
+    }
+});
+
+// Reset Password
+router.post('/reset-password', async (req, res) => {
+    try {
+        const data = req.body;
+        const result = await database('tb_petugas').where('email', data.email).first();
+        if (result) {
+            const password = bcrypt.hashSync(data.password, 10);
+            await database('tb_petugas').update({
+                password: password,
+                updated_at: new Date()
+            }).where('id_petugas', result.id_petugas);
+
+            return res.status(200).json({
+                status: 1,
+                message: "Berhasil"
+            });
+        } else {
+            return res.status(404).json({
+                status: 0,
+                message: "Email tidak ditemukan"
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: 0,
+            message: error.message
+        })
+    }
+});
+
 
 
 
