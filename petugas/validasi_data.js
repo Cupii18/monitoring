@@ -27,5 +27,6 @@ module.exports.register = [
 
 module.exports.login = [
     check('username').not().isEmpty().withMessage('Username tidak boleh kosong'),
-    check('password').not().isEmpty().withMessage('Password tidak boleh kosong')
+    check('password').not().isEmpty().withMessage('Password tidak boleh kosong'),
+    check('recaptchaToken').not().isEmpty().withMessage('Recaptcha is required')
 ]

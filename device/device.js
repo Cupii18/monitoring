@@ -3,6 +3,7 @@ const router = express.Router();
 const database = require("../config/database");
 const validasi_data = require("./validasi_data");
 const verifikasi_validasi_data = require("../middleware/verifikasi_validasi_data");
+const moment = require("moment");
 
 router.get('/', async (req, res) => {
     try {
@@ -63,6 +64,103 @@ router.get('/', async (req, res) => {
             result.data[i].indikator = indikator
 
             result.data[i].nama_indikator = result.data[i].nama_indikator.join(', ')
+
+            for (let j = 0; j < indikator.length; j++) {
+                const element = indikator[j];
+                const data = await database
+                    .select(
+                        'monitor_dc.id_monitor_dc',
+                        'monitor_dc.waktu',
+                        'device.id_device',
+                        'indikator.id_indikator',
+                        'jenis_device.id_jenis_device',
+                        'monitor_dc.arus',
+                        'monitor_dc.tegangan',
+                        'monitor_dc.watt',
+                        'monitor_dc.kwh',
+                        'indikator.satuan',
+                    )
+                    .from('monitor_dc as monitor_dc')
+                    .leftJoin('tb_device as device', 'monitor_dc.id_device', 'device.id_device')
+                    .leftJoin('tb_indikator as indikator', 'indikator.id_device', 'device.id_device')
+                    .leftJoin('tb_jenis_device as jenis_device', 'device.id_jenis_device', 'jenis_device.id_jenis_device')
+                    .where('monitor_dc.id_device', result.data[i].id_device)
+                    .join(
+                        database.raw(
+                            '(select max(id_monitor_dc) as id_monitor_dc from monitor_dc group by id_device) as max_monitor_dc'
+                        ),
+                        'monitor_dc.id_monitor_dc',
+                        'max_monitor_dc.id_monitor_dc'
+                    ).first()
+
+                const waktu = moment.utc(data.waktu, 'YYYY-MM-DDTHH:mm:ss.SSS').format('YYYY-MM-DD HH:mm:ss')
+                const now = moment().format('YYYY-MM-DD HH:mm:ss')
+                const checkBatas = await database
+                    .select(
+                        'tb_threshold.id_threshold',
+                        'tb_threshold.id_indikator',
+                        'tb_threshold.minimum',
+                        'tb_threshold.maksimum',
+                    )
+                    .from('tb_threshold')
+                    .join('tb_indikator', 'tb_threshold.id_indikator', 'tb_indikator.id_indikator')
+                    .join('tb_device', 'tb_indikator.id_device', 'tb_device.id_device')
+                    .join('tb_jenis_device', 'tb_device.id_jenis_device', 'tb_jenis_device.id_jenis_device')
+                    .where('tb_threshold.id_indikator', data.id_indikator)
+                    .andWhere('tb_jenis_device.id_jenis_device', data.id_jenis_device)
+                    .andWhere('tb_device.id_device', data.id_device)
+                    .first()
+
+                if (checkBatas) {
+                    if (moment(waktu).format('YYYY-MM-DD') == moment(now).format('YYYY-MM-DD') && moment(waktu).format('HH') == moment(now).format('HH')) {
+                        if (data.satuan == 'A') {
+                            if (data.arus < checkBatas.minimum || data.arus > checkBatas.maksimum) {
+                                if (data.arus <= data.minimum || data.arus >= data.maksimum) {
+                                    data.status = 'danger'
+                                } else {
+                                    data.status = 'warning'
+                                }
+                            } else {
+                                data.status = 'success'
+                            }
+                        } else if (data.satuan == 'W') {
+                            if (data.watt < checkBatas.minimum || data.watt > checkBatas.maksimum) {
+                                if (data.watt <= data.minimum || data.watt >= data.maksimum) {
+                                    data.status = 'danger'
+                                } else {
+                                    data.status = 'warning'
+                                }
+                            } else {
+                                data.status = 'success'
+                            }
+                        } else if (data.satuan == 'Wh') {
+                            if (data.kwh < checkBatas.minimum || data.kwh > checkBatas.maksimum) {
+                                if (data.kwh <= data.minimum || data.kwh >= data.maksimum) {
+                                    data.status = 'danger'
+                                } else {
+                                    data.status = 'warning'
+                                }
+                            } else {
+                                data.status = 'success'
+                            }
+                        } else if (data.satuan == 'V') {
+                            if (data.tegangan < checkBatas.minimum || data.tegangan > checkBatas.maksimum) {
+                                if (data.tegangan <= data.minimum || data.tegangan >= data.maksimum) {
+                                    data.status = 'danger'
+                                } else {
+                                    data.status = 'warning'
+                                }
+                            } else {
+                                data.status = 'success'
+                            }
+                        }
+                    } else {
+                        data.status = 'secondary'
+                    }
+                }
+
+                element.status = data.status
+            }
         }
 
 
