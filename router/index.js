@@ -10,7 +10,6 @@ router.use("/jenis_device", verifikasi_token, require("../jenis_device/jenis_dev
 router.use("/sektor", verifikasi_token, require("../sektor/sektor"));
 router.use("/indikator", verifikasi_token, require("../indikator/indikator"));
 router.use("/device", verifikasi_token, require("../device/device"));
-// router.use("/monitor_dc", require("../monitor_dc/monitor_dc"));
 router.use("/alert", verifikasi_token, require("../alert/alert"));
 router.use("/report", verifikasi_token, require("../report/report"));
 router.use("/threshold", verifikasi_token, require("../threshold/threshold"));
